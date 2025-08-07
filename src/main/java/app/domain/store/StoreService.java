@@ -44,7 +44,6 @@ public class StoreService {
 	private final MenuRepository menuRepository;
 	private final ReviewRepository reviewRepository;
 	private final OrdersRepository ordersRepository;
-	private final OrderService orderService;
 	private final SecurityUtil securityUtil;
 
 	@Transactional

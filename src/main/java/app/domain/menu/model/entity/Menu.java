@@ -3,6 +3,8 @@ package app.domain.menu.model.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import app.domain.store.model.entity.Store;
 import app.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -27,6 +29,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@SQLRestriction("deleted_at IS NULL")
 public class Menu extends BaseEntity {
 
 	@Id
@@ -46,9 +49,9 @@ public class Menu extends BaseEntity {
 	@Column
 	private String description;
 
-	@Column(nullable = false)
 	@Builder.Default
-	private boolean isHidden = false;
+	@Column(name = "is_hidden", nullable = false)
+	private boolean hidden = false;
 
 	public void update(String name, Long price, String description, Boolean isHidden) {
 		if (name != null) {
@@ -61,7 +64,7 @@ public class Menu extends BaseEntity {
 			this.description = description;
 		}
 		if (isHidden != null) {
-			this.isHidden = isHidden;
+			this.hidden = isHidden;
 		}
 	}
 

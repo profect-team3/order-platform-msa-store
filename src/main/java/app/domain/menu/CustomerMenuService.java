@@ -25,11 +25,11 @@ public class CustomerMenuService {
 
 	@Transactional(readOnly = true)
 	public PagedResponse<GetMenuListResponse> getMenusByStoreId(UUID storeId, Pageable pageable) {
-		boolean exists = storeRepository.existsByStoreIdAndDeletedAtIsNull(storeId);
+		boolean exists = storeRepository.existsByStoreId(storeId);
 		if (!exists) {
 			throw new GeneralException(ErrorStatus.STORE_NOT_FOUND);
 		}
-		Page<Menu> menuPage = menuRepository.findByStoreStoreIdAndHiddenFalse(storeId, pageable);
+		Page<Menu> menuPage = menuRepository.findByStoreStoreIdAndHiddenIsFalse(storeId, pageable);
 		Page<GetMenuListResponse> mapped = menuPage.map(GetMenuListResponse::from);
 
 		return PagedResponse.from(mapped);

@@ -10,12 +10,11 @@ import org.springframework.stereotype.Repository;
 import app.domain.store.model.entity.Region;
 import app.domain.store.model.entity.Store;
 import app.domain.store.status.StoreAcceptStatus;
-import app.domain.user.model.entity.User;
 
 @Repository
 public interface StoreRepository extends JpaRepository<Store, UUID> {
 
-	Optional<Store> findByUser_UserId(Long userId);
+	// Optional<Store> findByUser_UserId(Long userId);
 
 	boolean existsByStoreNameAndRegion(String storeName, Region region);
 
@@ -23,6 +22,9 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 
 	Optional<Store> findByStoreIdAndStoreAcceptStatusAndDeletedAtIsNull(UUID storeId, StoreAcceptStatus status);
 
-	boolean existsByStoreIdAndDeletedAtIsNull(UUID storeId);
-	List<Store> user(User user);
+	boolean existsByStoreId(UUID storeId);
+	// List<Store> user(User user);
+
+	boolean existsByStoreIdAndUserId(UUID storeId, Long userId);
+
 }

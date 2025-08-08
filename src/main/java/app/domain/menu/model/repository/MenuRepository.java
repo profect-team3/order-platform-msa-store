@@ -20,5 +20,9 @@ public interface MenuRepository extends JpaRepository<Menu, UUID> {
 
 	boolean existsByStoreAndNameAndDeletedAtIsNull(Store store, String name);
 
-	Page<Menu> findByStoreStoreIdAndHiddenFalse(UUID storeId, Pageable pageable);
+	Page<Menu> findByStoreStoreIdAndHiddenIsFalse(UUID storeId, Pageable pageable);
+
+	List<Menu> findAllByMenuIdInAndHiddenIsFalse(List<UUID> menuIds);
+
+
 }

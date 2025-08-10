@@ -143,5 +143,4 @@ class StoreControllerTest {
         verifyNoInteractions(storeService);
     }
 
-    // TODO: 다른 StoreController 메서드에 대한 테스트 케이스 추가
 }

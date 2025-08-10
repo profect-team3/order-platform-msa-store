@@ -115,5 +115,4 @@ class StoreServiceTest {
         verifyNoInteractions(regionRepository, categoryRepository, storeRepository);
     }
 
-    // TODO: 다른 StoreService 메서드에 대한 테스트 케이스 추가
 }

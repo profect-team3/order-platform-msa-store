@@ -60,7 +60,8 @@ public class Store extends BaseEntity {
 	private String phoneNumber;
 
 	@Column(nullable = false)
-	private long minOrderAmount = 0;
+	@Builder.Default
+	private Long minOrderAmount = 0L;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

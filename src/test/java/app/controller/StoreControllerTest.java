@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,14 +31,13 @@ import app.domain.store.repository.RegionRepository;
 import app.domain.store.repository.StoreRepository;
 import app.domain.store.status.StoreAcceptStatus;
 import app.domain.store.status.StoreErrorCode;
-import app.global.apiPayload.exception.ExceptionAdvice; // ExceptionAdvice import 추가
-import app.global.apiPayload.exception.GeneralException;
+import app.global.apiPayload.exception.ExceptionAdvice;
 
 @ExtendWith(MockitoExtension.class)
 class StoreControllerTest {
 
     private MockMvc mockMvc;
-    private ObjectMapper objectMapper = new ObjectMapper(); // 수동 생성
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private StoreService storeService;
@@ -54,7 +54,8 @@ class StoreControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(storeController)
-            .setControllerAdvice(new ExceptionAdvice()) // ExceptionAdvice 등록
+            .setControllerAdvice(new ExceptionAdvice())
+            .setValidator(new LocalValidatorFactoryBean())
             .build();
     }
 
@@ -103,7 +104,7 @@ class StoreControllerTest {
             null
         );
 
-        // When & Then
+
         mockMvc.perform(post("/store")
                 .header("X-User-ID", testUserId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +131,7 @@ class StoreControllerTest {
 
         Region mockRegion = mock(Region.class);
         when(regionRepository.findById(any(UUID.class))).thenReturn(Optional.of(mockRegion));
-        when(storeRepository.existsByStoreNameAndRegion(anyString(), any(Region.class))).thenReturn(true); // 중복 발생
+        when(storeRepository.existsByStoreNameAndRegion(anyString(), any(Region.class))).thenReturn(true);
 
         mockMvc.perform(post("/store")
                 .header("X-User-ID", testUserId)

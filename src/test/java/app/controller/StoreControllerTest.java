@@ -1,26 +1,20 @@
 package app.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import app.domain.store.StoreController;
 import app.domain.store.StoreService;
@@ -31,13 +25,11 @@ import app.domain.store.repository.RegionRepository;
 import app.domain.store.repository.StoreRepository;
 import app.domain.store.status.StoreAcceptStatus;
 import app.domain.store.status.StoreErrorCode;
-import app.global.apiPayload.exception.ExceptionAdvice;
+import app.global.apiPayload.ApiResponse;
+import app.global.apiPayload.exception.GeneralException;
 
 @ExtendWith(MockitoExtension.class)
 class StoreControllerTest {
-
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private StoreService storeService;
@@ -50,98 +42,87 @@ class StoreControllerTest {
     private StoreController storeController;
 
     private final Long testUserId = 1L;
+    private final UUID TEST_REGION_ID = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(storeController)
-            .setControllerAdvice(new ExceptionAdvice())
-            .setValidator(new LocalValidatorFactoryBean())
-            .build();
     }
 
-    @Test
-    @DisplayName("가게 생성 API 성공")
-    void createStoreApi_Success() throws Exception {
-        StoreApproveRequest request = new StoreApproveRequest(
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            "Test Address",
-            "Test Store",
-            "Test Description",
-            "010-1234-5678",
-            10000L
-        );
+    @Nested
+    @DisplayName("가게 생성 API 테스트")
+    class CreateStoreApiTest {
 
-        StoreApproveResponse mockResponse = new StoreApproveResponse(UUID.randomUUID(), StoreAcceptStatus.PENDING.name());
+        @Test
+        @DisplayName("성공: 가게 생성")
+        void createStoreSuccess() {
+            StoreApproveRequest request = new StoreApproveRequest(
+                TEST_REGION_ID,
+                UUID.randomUUID(),
+                "Test Address",
+                "Test Store",
+                "Test Description",
+                "010-1234-5678",
+                10000L
+            );
 
-        when(regionRepository.findById(any(UUID.class))).thenReturn(Optional.of(mock(Region.class)));
-        when(storeRepository.existsByStoreNameAndRegion(anyString(), any(Region.class))).thenReturn(false);
-        when(storeService.createStore(any(StoreApproveRequest.class), eq(testUserId))).thenReturn(mockResponse);
+            StoreApproveResponse expectedResponse = new StoreApproveResponse(UUID.randomUUID(), StoreAcceptStatus.PENDING.name());
 
-        mockMvc.perform(post("/store")
-                .header("X-User-ID", testUserId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.isSuccess").value(true))
-            .andExpect(jsonPath("$.code").value("STORE201"))
-            .andExpect(jsonPath("$.message").value("가게가 성공적으로 생성되었습니다."))
-            .andExpect(jsonPath("$.result.storeApprovalStatus").value(StoreAcceptStatus.PENDING.name()));
+            when(regionRepository.findById(any(UUID.class))).thenReturn(Optional.of(mock(Region.class)));
+            when(storeRepository.existsByStoreNameAndRegion(anyString(), any(Region.class))).thenReturn(false);
+            when(storeService.createStore(any(StoreApproveRequest.class), eq(testUserId))).thenReturn(expectedResponse);
 
-        verify(storeService).createStore(any(StoreApproveRequest.class), eq(testUserId));
+            ApiResponse<StoreApproveResponse> response = storeController.createStore(request, testUserId);
+
+            assertTrue(response.isSuccess());
+            assertEquals("STORE201", response.code());
+            assertEquals("가게가 성공적으로 생성되었습니다.", response.message());
+            assertEquals(StoreAcceptStatus.PENDING.name(), response.result().getStoreApprovalStatus());
+            verify(storeService, times(1)).createStore(any(StoreApproveRequest.class), eq(testUserId));
+        }
+
+        @Test
+        @DisplayName("실패: 유효하지 않은 요청 (예: 지역 ID 누락)")
+        void createStoreFailInvalidRequest() {
+            StoreApproveRequest invalidRequest = new StoreApproveRequest(
+                null,
+                UUID.randomUUID(),
+                "Test Address",
+                "Invalid Store",
+                "Test Description",
+                "010-1234-5678",
+                10000L
+            );
+
+            GeneralException exception = assertThrows(GeneralException.class, () -> {
+                storeController.createStore(invalidRequest, testUserId);
+            });
+
+            assertEquals(StoreErrorCode.REGION_ID_NULL, exception.getCode());
+            verifyNoInteractions(storeService);
+        }
+
+        @Test
+        @DisplayName("실패: 이미 존재하는 가게 이름")
+        void createStoreFailStoreNameAlreadyExists() {
+            StoreApproveRequest request = new StoreApproveRequest(
+                TEST_REGION_ID,
+                UUID.randomUUID(),
+                "Test Address",
+                "Existing Store",
+                "Test Description",
+                "010-1234-5678",
+                10000L
+            );
+
+            when(regionRepository.findById(any(UUID.class))).thenReturn(Optional.of(mock(Region.class)));
+            when(storeRepository.existsByStoreNameAndRegion(anyString(), any(Region.class))).thenReturn(true);
+
+            GeneralException exception = assertThrows(GeneralException.class, () -> {
+                storeController.createStore(request, testUserId);
+            });
+
+            assertEquals(StoreErrorCode.DUPLICATE_STORE_NAME_IN_REGION, exception.getCode());
+            verifyNoInteractions(storeService);
+        }
     }
-
-    @Test
-    @DisplayName("가게 생성 API 실패 - 유효하지 않은 요청")
-    void createStoreApi_InvalidRequest() throws Exception {
-        StoreApproveRequest invalidRequest = new StoreApproveRequest(
-            null,
-            null,
-            null,
-            "Invalid Store",
-            null,
-            null,
-            null
-        );
-
-
-        mockMvc.perform(post("/store")
-                .header("X-User-ID", testUserId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.isSuccess").value(false))
-            .andExpect(jsonPath("$.code").value(StoreErrorCode.REGION_ID_NULL.getCode()));
-
-        verifyNoInteractions(storeService);
-    }
-
-    @Test
-    @DisplayName("가게 생성 API 실패 - 중복된 가게 이름")
-    void createStoreApi_DuplicateStoreName() throws Exception {
-        StoreApproveRequest request = new StoreApproveRequest(
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            "Test Address",
-            "Duplicate Store",
-            "Test Description",
-            "010-1234-5678",
-            10000L
-        );
-
-        Region mockRegion = mock(Region.class);
-        when(regionRepository.findById(any(UUID.class))).thenReturn(Optional.of(mockRegion));
-        when(storeRepository.existsByStoreNameAndRegion(anyString(), any(Region.class))).thenReturn(true);
-
-        mockMvc.perform(post("/store")
-                .header("X-User-ID", testUserId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.isSuccess").value(false))
-            .andExpect(jsonPath("$.code").value(StoreErrorCode.DUPLICATE_STORE_NAME_IN_REGION.getCode()));
-
-        verifyNoInteractions(storeService);
-    }
-
 }

@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.internal;
 
 import app.domain.menu.model.dto.response.MenuInfoResponse;
 import app.domain.menu.model.entity.Menu;

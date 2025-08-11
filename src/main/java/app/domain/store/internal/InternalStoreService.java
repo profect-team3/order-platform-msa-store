@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.internal;
 
 import java.util.UUID;
 

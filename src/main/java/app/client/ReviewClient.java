@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 // 임시 FeignClient 스텁
-@FeignClient(name = "review-service", url = "http://localhost:8083") // 실제 서비스 URL로 변경 필요
+@FeignClient(name = "reviewService", url = "http://localhost:8086") // 실제 서비스 URL로 변경 필요
 public interface ReviewClient {
 
-    @GetMapping("/reviews/store/{storeId}")
+    @GetMapping("/review/store/{storeId}")
     List<GetReviewResponse> getReviewsByStoreId(@PathVariable("storeId") UUID storeId);
 }

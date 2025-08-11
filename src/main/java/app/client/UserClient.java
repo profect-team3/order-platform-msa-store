@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "user-service", url = "http://localhost:8081") // 실제 서비스 URL로 변경 필요
 public interface UserClient {
 
-    @GetMapping("/users/{userId}/exists")
+    @GetMapping("/user/{userId}/exists")
     Boolean isUserExists(@PathVariable("userId") Long userId);
 
-    @GetMapping("/users/{userId}/name")
+    @GetMapping("/user/{userId}/name")
     String getUserName(@PathVariable("userId") Long userId);
 }

@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.internal;
 
 import app.domain.menu.model.dto.response.MenuInfoResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

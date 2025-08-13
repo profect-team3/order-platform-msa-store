@@ -11,15 +11,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MongoStoreMenuErrorCode implements BaseCode {
 
-	MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "MENU001", "해당 메뉴를 찾을 수 없습니다."),
-	STORE_NOT_FOUND_FOR_MENU(HttpStatus.NOT_FOUND, "MENU002", "메뉴를 등록할 가게를 찾을 수 없습니다."),
-	MENU_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "MENU003", "이미 삭제된 메뉴입니다."),
-	MENU_NAME_DUPLICATE(HttpStatus.CONFLICT, "MENU004", "해당 가게에 동일한 이름의 메뉴가 이미 존재합니다."),
-	MENU_NAME_NULL(HttpStatus.BAD_REQUEST, "MENU005", "메뉴 이름은 null일 수 없습니다."),
-	MENU_PRICE_NULL(HttpStatus.BAD_REQUEST, "MENU006", "메뉴 가격은 null일 수 없습니다."),
-	MENU_PRICE_INVALID(HttpStatus.BAD_REQUEST, "MENU007", "메뉴 가격은 0보다 커야 합니다."),
-	MENU_ID_NULL(HttpStatus.BAD_REQUEST, "MENU008", "메뉴 ID는 null일 수 없습니다."),
-	USER_NOT_FOUND_FOR_MENU(HttpStatus.NOT_FOUND, "MENU009", "메뉴 관련 작업을 수행할 사용자를 찾을 수 없습니다.");
+	MONGO_DB_CONNECTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "MONGO501", "MongoDB와의 연결이 불안정합니다."),
+	INVALID_MONGO_QUERY(HttpStatus.BAD_REQUEST, "MONGO400", "잘못된 형식의 데이터가 포함되어 쿼리 실행에 실패했습니다. 요청 데이터를 확인하세요."),
+	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE404", "요청하신 가게를 찾을 수 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

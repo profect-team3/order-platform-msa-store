@@ -39,4 +39,8 @@ public class GetStoreListResponse {
 			.averageRating(averageRating)
 			.build();
 	}
+
+	public void setAverageRating(double averageRating){
+		this.averageRating=averageRating;
+	}
 }

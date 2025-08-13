@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
+import app.domain.store.model.dto.response.GetUserInfoResponse;
 import app.global.apiPayload.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -51,4 +52,16 @@ public class UserClient {
         return response.getBody();
     }
 
+    public ApiResponse<GetUserInfoResponse> getUserInfo(Long userId){
+        String url = userServiceUrl + "internal/user/"+userId+"/info";
+
+        ResponseEntity<ApiResponse<GetUserInfoResponse>> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<ApiResponse<GetUserInfoResponse>>() {}
+        );
+
+        return response.getBody();
+    }
 }

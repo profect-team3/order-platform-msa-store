@@ -13,4 +13,7 @@ public interface StoreQueryRepository {
 		StoreAcceptStatus status,
 		Pageable pageable
 	);
+	PagedResponse<GetStoreListResponse> getApprovedStore(Pageable pageable);
+
+	PagedResponse<GetStoreListResponse> getAllStore(StoreAcceptStatus status, Pageable pageable);
 }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,5 +28,13 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 	// List<Store> user(User user);
 
 	boolean existsByStoreIdAndUserId(UUID storeId, Long userId);
+
+	Page<Store> findAllByStoreAcceptStatus(StoreAcceptStatus status, Pageable pageable);
+
+	Page<Store> findByStoreAcceptStatusAndStoreNameContainingIgnoreCase(
+		StoreAcceptStatus status, String keyword, Pageable pageable);
+
+	Page<Store> findByStoreAcceptStatusAndDeletedAtIsNull(
+		StoreAcceptStatus status, Pageable pageable);
 
 }

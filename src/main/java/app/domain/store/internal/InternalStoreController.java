@@ -41,5 +41,10 @@ public class InternalStoreController {
 		return ApiResponse.onSuccess(StoreSuccessStatus.STORE_OWNER_SUCCESS,result);
 	}
 
+	@GetMapping("/{storeId}/name")
+	public ApiResponse<String> getStoreName(@PathVariable UUID storeId){
+		String name =internalStoreService.getStoreName(storeId);
+		return ApiResponse.onSuccess(StoreSuccessStatus.STORE_NAME_FETCHED,name);
+	}
 
 }

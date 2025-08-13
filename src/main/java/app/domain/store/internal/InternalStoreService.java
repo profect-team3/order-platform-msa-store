@@ -16,18 +16,16 @@ public class InternalStoreService {
 	private final StoreRepository storeRepository;
 
 	public boolean isStoreExists(UUID storeId) {
-		try {
-			return storeRepository.existsById(storeId);
-		} catch (Exception e) {
-			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
-		}
+		return storeRepository.existsById(storeId);
 	}
 
 	public boolean isStoreOwner(UUID storeId, Long userId) {
-		try {
-			return storeRepository.existsByStoreIdAndUserId(storeId, userId);
-		} catch (Exception e) {
-			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
-		}
+		return storeRepository.existsByStoreIdAndUserId(storeId, userId);
+	}
+
+	public String getStoreName(UUID storeId){
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND))
+			.getStoreName();
 	}
 }

@@ -19,8 +19,8 @@ spring:
         show_sql: true
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@localhost:27017/store_db
-      database: store_db
+      uri: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/?authSource=admin
+      database: store-db
 
 server:
   port: 8082

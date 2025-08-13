@@ -17,12 +17,13 @@ public class GetCustomerStoreDetailResponse {
 	private String phoneNumber;
 	private long minOrderAmount;
 	private String categoryName;
+	private long reviewNumber;
 	private double averageRating;
 
 	public GetCustomerStoreDetailResponse() {
 	}
 
-	public GetCustomerStoreDetailResponse(UUID storeId, String storeName, String description, String address, String phoneNumber, long minOrderAmount, String categoryName, double averageRating) {
+	public GetCustomerStoreDetailResponse(UUID storeId, String storeName, String description, String address, String phoneNumber, long minOrderAmount, String categoryName,long reviewNumber ,double averageRating) {
 		this.storeId = storeId;
 		this.storeName = storeName;
 		this.description = description;
@@ -30,10 +31,11 @@ public class GetCustomerStoreDetailResponse {
 		this.phoneNumber = phoneNumber;
 		this.minOrderAmount = minOrderAmount;
 		this.categoryName = categoryName;
+		this.reviewNumber=reviewNumber;
 		this.averageRating = averageRating;
 	}
 
-	public static GetCustomerStoreDetailResponse from(Store store, double avgRating) {
+	public static GetCustomerStoreDetailResponse from(Store store, long reviewNumber,double avgRating) {
 		return GetCustomerStoreDetailResponse.builder()
 			.storeId(store.getStoreId())
 			.storeName(store.getStoreName())
@@ -42,6 +44,7 @@ public class GetCustomerStoreDetailResponse {
 			.phoneNumber(store.getPhoneNumber())
 			.minOrderAmount(store.getMinOrderAmount())
 			.categoryName(store.getCategory().getCategoryName())
+			.reviewNumber(reviewNumber)
 			.averageRating(avgRating)
 			.build();
 	}

@@ -1,13 +1,21 @@
 package app.domain.store.client;
 
+import app.domain.store.model.dto.response.GetReviewResponse;
+import app.global.apiPayload.ApiResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -15,37 +23,39 @@ public class ReviewClient {
 
 	private final RestTemplate restTemplate;
 
-	private static final String REVIEW_SERVICE_URL = "http://review";
+	@Value("${review.service.url:http://localhost:8086}")
+	private String reviewServiceUrl;
 
-	public Map<UUID, RatingSummary> fetchRating(List<UUID> storeIds) {
-		if (storeIds == null || storeIds.isEmpty()) {
-			return Collections.emptyMap();
-		}
+	public ApiResponse<List<StoreReviewResponse>> getStoreReviewAverage(List<UUID> storeIds) {
+		String url = reviewServiceUrl + "/internal/review/average";
 
-		String ids = storeIds.stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(","));
+		HttpEntity<List<UUID>> requestEntity = new HttpEntity<>(storeIds);
+		
+		ResponseEntity<ApiResponse<List<StoreReviewResponse>>> response = restTemplate.exchange(
+			url,
+			HttpMethod.GET,
+			requestEntity,
+			new ParameterizedTypeReference<ApiResponse<List<StoreReviewResponse>>>() {}
+		);
 
-		String url = UriComponentsBuilder
-			.fromHttpUrl(REVIEW_SERVICE_URL + "/internal/ratings")
-			.queryParam("storeIds", ids)
-			.toUriString();
-
-		Map<UUID, RatingSummary> response =
-			restTemplate.getForObject(url, Map.class);
-
-		return Optional.ofNullable(response)
-			.orElseGet(Collections::emptyMap);
+		return response.getBody();
 	}
-	public RatingSummary fetchRating(UUID storeId) {
-		var url = REVIEW_SERVICE_URL + "/internal/ratings" + storeId;
-		var resp = restTemplate.getForEntity(url, RatingSummary.class);
-		return Objects.requireNonNullElseGet(resp.getBody(), () -> new RatingSummary());
+
+	public ApiResponse<List<GetReviewResponse>> getReviewsByStoreId(UUID storeId){
+		String url = reviewServiceUrl + "/internal/review/"+storeId;
+		ResponseEntity<ApiResponse<List<GetReviewResponse>>> response = restTemplate.exchange(
+			url,
+			HttpMethod.GET,
+			null,
+			new ParameterizedTypeReference<ApiResponse<List<GetReviewResponse>>>() {}
+		);
+		return response.getBody();
 	}
 
 	@Data
-	public static class RatingSummary {
-		private double avg;
-		private long count;
+	public static class StoreReviewResponse {
+		private UUID storeId;
+		private Long number;
+		private Double average;
 	}
 }

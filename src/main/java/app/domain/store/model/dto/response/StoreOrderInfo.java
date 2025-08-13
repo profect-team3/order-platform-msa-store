@@ -1,4 +1,4 @@
-package app.client;
+package app.domain.store.model.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderInfo {
+public class StoreOrderInfo {
     private UUID orderId;
     private UUID storeId;
     private Long customerId;

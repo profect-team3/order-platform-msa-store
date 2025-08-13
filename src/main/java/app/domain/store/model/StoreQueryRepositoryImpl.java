@@ -19,6 +19,8 @@ import app.domain.store.model.entity.QStore;
 import app.domain.store.model.entity.Store;
 import app.domain.store.status.StoreAcceptStatus;
 import app.global.apiPayload.PagedResponse;
+import app.global.apiPayload.code.status.ErrorStatus;
+import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 
 
@@ -65,16 +67,32 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
 			.where(where)
 			.fetchOne();
 
-		// (선택) 리뷰 평균 병합
+		// 리뷰 평균 병합
 		List<UUID> ids = stores.stream().map(Store::getStoreId).toList();
-		Map<UUID, ReviewClient.RatingSummary> summaries =
-			ids.isEmpty() ? Map.of() : reviewClient.fetchRating(ids);
+		Map<UUID, ReviewClient.StoreReviewResponse> reviewMap = Map.of();
+		
+		if (!ids.isEmpty()) {
+			try {
+				var storeReviewResponse = reviewClient.getStoreReviewAverage(ids);
+				if (storeReviewResponse.isSuccess()) {
+					reviewMap = storeReviewResponse.result().stream()
+						.collect(Collectors.toMap(
+							ReviewClient.StoreReviewResponse::getStoreId,
+							review -> review
+						));
+				}
+			} catch (Exception e) {
+				throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+			}
+		}
 
+		Map<UUID, ReviewClient.StoreReviewResponse> finalReviewMap = reviewMap;
 		List<GetStoreListResponse> content = stores.stream()
 			.map(s -> {
-				var sum = summaries.get(s.getStoreId());
-				double avg = (sum != null) ? sum.getAvg() : 0.0;
-				return GetStoreListResponse.from(s, avg);
+				ReviewClient.StoreReviewResponse review = finalReviewMap.get(s.getStoreId());
+				long number = (review != null) ? review.getNumber() : 0L;
+				double avg = (review != null) ? review.getAverage() : 0.0;
+				return GetStoreListResponse.from(s, number, avg);
 			})
 			.toList();
 

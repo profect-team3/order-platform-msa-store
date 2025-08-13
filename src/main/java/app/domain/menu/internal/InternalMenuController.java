@@ -1,6 +1,8 @@
 package app.domain.menu.internal;
 
 import app.domain.menu.model.dto.response.MenuInfoResponse;
+import app.domain.menu.status.StoreMenuSuccessStatus;
+import app.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +19,7 @@ public class InternalMenuController {
 	private final InternalMenuService internalMenuService;
 
 	@PostMapping("/batch")
-	public List<MenuInfoResponse> getMenuInfoList(@RequestBody List<UUID> menuIds) {
-		return internalMenuService.getMenuInfoList(menuIds);
+	public ApiResponse<List<MenuInfoResponse>> getMenuInfoList(@RequestBody List<UUID> menuIds) {
+		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_INFO_BATCH_SUCCESS,internalMenuService.getMenuInfoList(menuIds));
 	}
 }

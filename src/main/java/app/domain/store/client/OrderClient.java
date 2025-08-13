@@ -3,22 +3,60 @@ package app.domain.store.client;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import app.domain.store.model.dto.response.OrderInfo;
 import app.domain.store.model.dto.response.StoreOrderInfo;
+import app.global.apiPayload.ApiResponse;
+import lombok.RequiredArgsConstructor;
 
-@FeignClient(name = "order-service", url = "http://localhost:8084") // 실제 서비스 URL로 변경?
-public interface OrderClient {
+@Component
+@RequiredArgsConstructor
+public class OrderClient {
 
-    @GetMapping("/order/store/{storeId}")
-    List<StoreOrderInfo> getOrdersByStoreId(@PathVariable("storeId") UUID storeId);
+    private final RestTemplate restTemplate;
 
-    @GetMapping("/order/{orderId}/info")
-    OrderInfo getOrderInfo(@PathVariable("orderId") UUID orderId);
+    @Value("${order.service.url:http://localhost:8084}")
+    private String orderServiceUrl;
+
+    public ApiResponse<List<StoreOrderInfo>> getOrdersByStoreId(UUID storeId){
+        String url = orderServiceUrl + "/internal/order/store/"+storeId;
+        ResponseEntity<ApiResponse<List<StoreOrderInfo>>> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<ApiResponse<List<StoreOrderInfo>>>() {}
+        );
+        return response.getBody();
+    }
+
+    public ApiResponse<OrderInfo> getOrderInfo(UUID orderId){
+        String url = orderServiceUrl + "/internal/order/"+orderId;
+        ResponseEntity<ApiResponse<OrderInfo>> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<ApiResponse<OrderInfo>>() {}
+        );
+        return response.getBody();
+    }
+
+    public ApiResponse<String> updateOrderStatus(UUID orderId,String status){
+        String url = orderServiceUrl + "/internal/order/"+orderId+"/status";
+        HttpEntity<String> requestEntity=new HttpEntity<>(status);
+        ResponseEntity<ApiResponse<String>> response = restTemplate.exchange(
+            url,
+            HttpMethod.POST,
+            requestEntity,
+            new ParameterizedTypeReference<ApiResponse<String>>() {}
+        );
+        return response.getBody();
+    }
 
 }

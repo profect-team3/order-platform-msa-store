@@ -7,8 +7,9 @@ import app.domain.store.status.StoreAcceptStatus;
 import app.global.apiPayload.PagedResponse;
 
 public interface StoreQueryRepository {
-	PagedResponse<GetStoreListResponse> searchStoresWithAvgRating(
+	PagedResponse<GetStoreListResponse> searchStores(
 		String keyword,
+		String categoryKeyword,
 		StoreAcceptStatus status,
 		Pageable pageable
 	);

@@ -5,6 +5,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import app.domain.store.repository.StoreRepository;
+import app.global.apiPayload.code.status.ErrorStatus;
+import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,5 +21,11 @@ public class InternalStoreService {
 
 	public boolean isStoreOwner(UUID storeId, Long userId) {
 		return storeRepository.existsByStoreIdAndUserId(storeId, userId);
+	}
+
+	public String getStoreName(UUID storeId){
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND))
+			.getStoreName();
 	}
 }

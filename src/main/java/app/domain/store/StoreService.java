@@ -7,19 +7,21 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import app.client.OrderClient;
-import app.client.ReviewClient;
-import app.client.UserClient;
+import app.domain.store.client.OrderClient;
+import app.domain.store.client.ReviewClient;
+import app.domain.store.client.UserClient;
 import app.domain.menu.model.dto.response.MenuListResponse;
 import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.entity.Menu;
 import app.domain.menu.model.repository.CategoryRepository;
 import app.domain.menu.model.repository.MenuRepository;
-import app.client.GetReviewResponse;
+import app.domain.store.model.dto.response.GetReviewResponse;
 import app.domain.store.model.dto.request.StoreApproveRequest;
 import app.domain.store.model.dto.request.StoreInfoUpdateRequest;
+import app.domain.store.model.dto.response.OrderInfo;
 import app.domain.store.model.dto.response.StoreApproveResponse;
 import app.domain.store.model.dto.response.StoreInfoUpdateResponse;
+import app.domain.store.model.dto.response.StoreOrderInfo;
 import app.domain.store.model.dto.response.StoreOrderListResponse;
 import app.domain.store.model.entity.Region;
 import app.domain.store.model.entity.Store;
@@ -27,6 +29,8 @@ import app.domain.store.repository.RegionRepository;
 import app.domain.store.repository.StoreRepository;
 import app.domain.store.status.StoreAcceptStatus;
 import app.domain.store.status.StoreErrorCode;
+import app.global.apiPayload.ApiResponse;
+import app.global.apiPayload.code.status.ErrorStatus;
 import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +49,13 @@ public class StoreService {
 	@Transactional
 	public StoreApproveResponse createStore(StoreApproveRequest request, Long userId) {
 
-		if (!userClient.isUserExists(userId)) {
+		ApiResponse<Boolean> isUserExistsResponse = userClient.isUserExists(userId);
+
+		Boolean isUserExists=isUserExistsResponse.result();
+		if(!isUserExistsResponse.isSuccess()){
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		}
+		if (!isUserExists) {
 			throw new GeneralException(StoreErrorCode.USER_NOT_FOUND);
 		}
 
@@ -141,9 +151,12 @@ public class StoreService {
 			throw new GeneralException(StoreErrorCode.INVALID_USER_ROLE);
 		}
 
-		List<GetReviewResponse> reviews = reviewClient.getReviewsByStoreId(storeId);
+		ApiResponse<List<GetReviewResponse>> getReviewResponse = reviewClient.getReviewsByStoreId(storeId);
+		if(!getReviewResponse.isSuccess()){
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		}
 
-		return reviews;
+		return getReviewResponse.result();
 	}
 
 	@Transactional(readOnly = true)
@@ -156,11 +169,20 @@ public class StoreService {
 			throw new GeneralException(StoreErrorCode.INVALID_USER_ROLE);
 		}
 
-		List<app.client.StoreOrderInfo> orders = orderClient.getOrdersByStoreId(storeId);
+		ApiResponse<List<StoreOrderInfo>> storeOrderInfoResponse = orderClient.getOrdersByStoreId(storeId);
+		if(!storeOrderInfoResponse.isSuccess()){
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		}
 
+		List<StoreOrderInfo> orders= storeOrderInfoResponse.result();
 		List<StoreOrderListResponse.StoreOrderDetail> orderDetails = orders.stream()
 			.map(orderInfo -> {
-				String customerName = userClient.getUserName(orderInfo.getCustomerId());
+				ApiResponse<String> getUserNameResponse =userClient.getUserName(orderInfo.getCustomerId());
+				if(!getUserNameResponse.isSuccess()){
+					throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
+				}
+
+				String customerName = getUserNameResponse.result();
 				return new StoreOrderListResponse.StoreOrderDetail(
 					orderInfo.getOrderId(),
 					orderInfo.getCustomerId(),
@@ -178,7 +200,11 @@ public class StoreService {
 	@Transactional
 	public void acceptOrder(UUID orderId, Long userId) {
 
-		app.client.OrderInfo orderInfo = orderClient.getOrderInfo(orderId);
+		ApiResponse<OrderInfo> orderInfoResponse = orderClient.getOrderInfo(orderId);
+		if(!orderInfoResponse.isSuccess()){
+			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
+		}
+		OrderInfo orderInfo=orderInfoResponse.result();
 
 		Store store = storeRepository.findById(orderInfo.getStoreId())
 			.orElseThrow(() -> new GeneralException(StoreErrorCode.STORE_NOT_FOUND));
@@ -187,13 +213,21 @@ public class StoreService {
 			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
 		}
 
-		orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+		ApiResponse<String> updateOrderStatusResponse =orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+		if(!updateOrderStatusResponse.isSuccess()){
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		}
+
 	}
 
 	@Transactional
 	public void rejectOrder(UUID orderId, Long userId) {
 
-		app.client.OrderInfo orderInfo = orderClient.getOrderInfo(orderId);
+		ApiResponse<OrderInfo> orderInfoResponse = orderClient.getOrderInfo(orderId);
+		if(!orderInfoResponse.isSuccess()){
+			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
+		}
+		OrderInfo orderInfo=orderInfoResponse.result();
 
 		Store store = storeRepository.findById(orderInfo.getStoreId())
 			.orElseThrow(() -> new GeneralException(StoreErrorCode.STORE_NOT_FOUND));
@@ -202,6 +236,9 @@ public class StoreService {
 			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
 		}
 
-		orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+		ApiResponse<String> updateOrderStatusResponse =orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+		if(!updateOrderStatusResponse.isSuccess()){
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		}
 	}
 }

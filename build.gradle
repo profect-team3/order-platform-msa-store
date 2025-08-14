@@ -53,9 +53,11 @@ dependencies {
     testImplementation 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
     // TEST
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.batch:spring-batch-test'
     testImplementation 'com.h2database:h2'
     testRuntimeOnly 'com.h2database:h2'
     //Query DSL
@@ -64,6 +66,18 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+
+
+
+//    // 보안 + 리소스 서버(JWT 검증)
+//    implementation "org.springframework.boot:spring-boot-starter-security"
+//    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+
+    // 헬스체크 등
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+
+    // (선택) 메서드 보안 @PreAuthorize 쓰면 안정적으로 AOP 포함 추천
+    implementation "org.springframework.boot:spring-boot-starter-aop"
 }
 
 clean {

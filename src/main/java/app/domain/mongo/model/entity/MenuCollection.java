@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class MongoMenu {
+public class MenuCollection {
 	@Id
 	private String menuId;
 	private String name;

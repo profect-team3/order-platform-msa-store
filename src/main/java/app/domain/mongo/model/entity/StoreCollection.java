@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 @Document(collection = "stores")
 @CompoundIndex(name = "store_search_index", def = "{'categoryKeys': 1, 'regionName': 1, 'isActive': 1}")
-public class MongoStore {
+public class StoreCollection {
 	@Id
 	private String id;
 	private Long userId;
@@ -27,6 +27,7 @@ public class MongoStore {
 	private Double avgRating;
 	private String phoneNumber;
 	private Long minOrderAmount;
+	private String address;
 	private String regionName;
 	private String regionFullName;
 	private String storeAcceptStatus;
@@ -37,6 +38,6 @@ public class MongoStore {
 	private Date updatedAt;
 	@Field("version")
 	private Long version;
-	private List<MongoMenu> menus;
+	private List<MenuCollection> menus;
 
 }

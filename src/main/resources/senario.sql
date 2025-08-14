@@ -38,9 +38,12 @@ VALUES (now(), NULL, NULL, NULL, 5000,
         '87654321-fedc-ba98-7654-3210fedcba08', '010-1234-5978', 'BHC 치킨', '서울특별시 강남구 테헤란로 125',
         '매일 신선한 재료로 만드는 치킨 전문점입니다.', 'APPROVE');
 
-
 -- 메뉴
 INSERT INTO p_menu ("created_at", "updated_at", "menu_id", "store_id", "name", "description", "price", "is_hidden")
 VALUES (now(), now(), 'd56e1bb1-a709-4772-b7da-a1b2b88af9c1', '87654321-fedc-ba98-7654-3210fedcba98', '허니콤보',
         '꿀맛 허니 콤보',
         23000, FALSE);
+
+--장바구니
+INSERT INTO p_cart ("created_at", "updated_at","user_id","cart_id")
+VALUES (now(),now(),1,'d56e7bb1-a709-4772-b7da-a1b2b88af9c1');

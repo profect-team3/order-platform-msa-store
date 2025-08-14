@@ -72,9 +72,9 @@ public class ManagerService {
 	}
 
 	@Transactional(readOnly = true)
-	public PagedResponse<GetStoreListResponse> searchStore(StoreAcceptStatus status, String keyword,
+	public PagedResponse<GetStoreListResponse> searchStore(String keyword,String category,StoreAcceptStatus status,
 		Pageable pageable) {
-		return storeQueryRepository.searchStores(keyword, status, pageable);
+		return storeQueryRepository.searchStores(keyword,category ,status,pageable);
 	}
 
 }

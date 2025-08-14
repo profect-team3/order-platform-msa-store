@@ -71,10 +71,11 @@ public class ManagerController {
 		description = "가게 제목에 따라서 검색 합니다.")
 	public ApiResponse<PagedResponse<GetStoreListResponse>> getAllStore(
 		@PageableDefault(size = 20, sort = "createdAt", direction = DESC) Pageable pageable,
+		@RequestParam(required = false) String category,
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) StoreAcceptStatus status
 	) {
-		return ApiResponse.onSuccess(ManagerSuccessStatus.MANAGER_SEARCH_STORE_OK,managerService.searchStore(status, keyword, pageable));
+		return ApiResponse.onSuccess(ManagerSuccessStatus.MANAGER_SEARCH_STORE_OK,managerService.searchStore(keyword,category,status,pageable));
 	}
 
 }

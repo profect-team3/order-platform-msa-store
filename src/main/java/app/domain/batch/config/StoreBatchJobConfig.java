@@ -27,11 +27,13 @@ public class StoreBatchJobConfig {
 	private final StoreBatchReader storeBatchReader;
 	private final StoreBatchProcessor storeBatchProcessor;
 	private final StoreBatchWriter storeBatchWriter;
+	private final DiscordNotificationListener discordNotificationListener;
 
 	@Bean
 	public Job storeBatchJob() {
 		return new JobBuilder("storeBatchJob", jobRepository)
 			.start(storeBatchStep())
+			.listener(discordNotificationListener)
 			.build();
 	}
 

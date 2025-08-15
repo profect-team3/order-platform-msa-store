@@ -16,7 +16,6 @@ public class StoreMenuDto {
 	private String address;
 	private String phoneNumber;
 	private String storeAcceptStatus;
-	private Boolean isDeleted;
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
 

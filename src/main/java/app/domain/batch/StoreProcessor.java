@@ -35,7 +35,6 @@ public class StoreProcessor implements ItemProcessor<StoreMenuDto, StoreCollecti
 		storeCollection.setRegionName(dto.getRegionName());
 		storeCollection.setRegionFullName(dto.getRegionFullName());
 		storeCollection.setStoreAcceptStatus(dto.getStoreAcceptStatus());
-		storeCollection.setIsActive(!dto.getIsDeleted());
 		storeCollection.setCreatedAt(Date.from(dto.getCreatedAt().toInstant()));
 		storeCollection.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant()));
 

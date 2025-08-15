@@ -1,8 +1,9 @@
-package app.domain.batch;
+package app.domain.batch.job;
 
-import app.domain.batch.model.dto.StoreMenuDto;
+import app.domain.batch.dto.StoreMenuDto;
 import app.domain.mongo.model.entity.MenuCollection;
 import app.domain.mongo.model.entity.StoreCollection;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemProcessor;
@@ -11,10 +12,11 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class StoreProcessor implements ItemProcessor<StoreMenuDto, StoreCollection> {
+public class StoreBatchProcessor implements ItemProcessor<StoreMenuDto, StoreCollection> {
 
 	private final ObjectMapper objectMapper;
 
@@ -28,6 +30,7 @@ public class StoreProcessor implements ItemProcessor<StoreMenuDto, StoreCollecti
 		storeCollection.setDescription(dto.getDescription());
 		storeCollection.setCategoryKeys(List.of(dto.getCategoryName()));
 		storeCollection.setPrimaryCategory(dto.getCategoryName());
+		storeCollection.setReviewCount(dto.getReviewCount());
 		storeCollection.setAvgRating(dto.getAvgRating());
 		storeCollection.setPhoneNumber(dto.getPhoneNumber());
 		storeCollection.setMinOrderAmount(dto.getMinOrderAmount());
@@ -38,13 +41,33 @@ public class StoreProcessor implements ItemProcessor<StoreMenuDto, StoreCollecti
 		storeCollection.setCreatedAt(Date.from(dto.getCreatedAt().toInstant()));
 		storeCollection.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant()));
 
-		if (dto.getMenuJson() != null) {
-			List<MenuCollection> menus = objectMapper.readValue(dto.getMenuJson(),
-				objectMapper.getTypeFactory().constructCollectionType(List.class, MenuCollection.class));
-			storeCollection.setMenus(menus);
-		} else {
-			storeCollection.setMenus(new ArrayList<>());
+		// JSON에서 메뉴 데이터 파싱
+		List<MenuCollection> menuCollections = new ArrayList<>();
+		if (dto.getMenuJson() != null && !dto.getMenuJson().trim().isEmpty() && !dto.getMenuJson().equals("[]")) {
+			try {
+				List<Map<String, Object>> menuMaps = objectMapper.readValue(
+					dto.getMenuJson(), 
+					new TypeReference<List<Map<String, Object>>>() {}
+				);
+				
+				menuCollections = menuMaps.stream()
+					.map(menuMap -> {
+						MenuCollection menuCollection = new MenuCollection();
+						menuCollection.setMenuId((String) menuMap.get("menuId"));
+						menuCollection.setName((String) menuMap.get("name"));
+						menuCollection.setPrice(((Number) menuMap.get("price")).intValue());
+						menuCollection.setDescription((String) menuMap.get("description"));
+						menuCollection.setHidden((Boolean) menuMap.get("isHidden"));
+						return menuCollection;
+					})
+					.toList();
+			} catch (Exception e) {
+				// JSON 파싱 실패 시 빈 리스트로 설정
+				menuCollections = new ArrayList<>();
+			}
 		}
+		
+		storeCollection.setMenus(menuCollections);
 
 		return storeCollection;
 	}

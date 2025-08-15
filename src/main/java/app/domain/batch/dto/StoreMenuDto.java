@@ -1,4 +1,4 @@
-package app.domain.batch.model.dto;
+package app.domain.batch.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,11 +18,13 @@ public class StoreMenuDto {
 	private String storeAcceptStatus;
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
+	private Timestamp deletedAt;
 
-	// 조인된 데이터
 	private String regionName;
 	private String regionFullName;
 	private String categoryName;
-	private String menuJson; // 메뉴 정보를 JSON 문자열로 저장
-	private Double avgRating; // 리뷰 평균 평점
+	private String menuJson;
+	private Long reviewCount;
+	private Double avgRating;
+
 }

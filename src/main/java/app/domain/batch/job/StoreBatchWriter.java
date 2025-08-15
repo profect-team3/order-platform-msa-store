@@ -1,4 +1,4 @@
-package app.domain.batch;
+package app.domain.batch.job;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -14,7 +14,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Component
 @RequiredArgsConstructor
-public class UpsertMongoStoreWriter implements ItemWriter<StoreCollection> {
+public class StoreBatchWriter implements ItemWriter<StoreCollection> {
 
 	private final MongoTemplate mongoTemplate;
 
@@ -46,7 +46,9 @@ public class UpsertMongoStoreWriter implements ItemWriter<StoreCollection> {
 			update.set("isActive", item.getIsActive());
 			update.set("createdAt", item.getCreatedAt());
 			update.set("updatedAt", item.getUpdatedAt());
+			update.set("deletedAt", item.getDeletedAt());
 			update.set("menus", item.getMenus());
+			update.set("reviewCount", item.getReviewCount());
 
 			// 버전 필드를 1씩 증가시키는 원자적(atomic) 연산
 			update.inc("version", 1);

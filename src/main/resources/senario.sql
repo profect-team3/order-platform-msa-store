@@ -47,6 +47,10 @@ VALUES (now(), now(), 'd56e1bb1-a709-4772-b7da-a1b2b88af9c1', '87654321-fedc-ba9
 
 
 -- 오더 생성
-INSERT INTO p_orders("created_at", "updated_at", "is_refundable", "total_price", "orders_id", "store_id", "order_channel", "order_status", "receipt_method", "payment_method", "delivery_address", "order_history")
+INSERT INTO p_orders("created_at", "updated_at", "is_refundable", "total_price", "orders_id", "store_id", "order_channel", "order_status", "receipt_method", "payment_method", "delivery_address", "order_history" , "user_id")
 VALUES (now(), now(), 'false', 1, '87654321-fedc-ba98-7654-3210feabba98', '87654321-fedc-ba98-7654-3210fedcba98', 'ONLINE',
-        'COMPLETED', 'DELIVERY', 'CREDIT_CARD', '서울특별시 강남구 테헤란로 125', 'sample text');
+        'COMPLETED', 'DELIVERY', 'CREDIT_CARD', '서울특별시 강남구 테헤란로 125', 'sample text', 1);
+
+-- 리뷰 생성
+INSERT INTO p_review("created_at", "updated_at", "rating", "user_id", "b_order_id", "review_id", "store_id", "content")
+VALUES (now(), now(), 5, 1, '87654321-fedc-ba98-7654-3210feabba98', '87654321-fedc-ba98-7654-3210feabba28', '87654321-fedc-ba98-7654-3210fedcba98', '맛있고 배달이 빨랐어요!');

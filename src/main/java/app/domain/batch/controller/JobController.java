@@ -10,6 +10,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +26,9 @@ import java.util.UUID;
 public class JobController {
 
 	private final JobLauncher jobLauncher;
-	private final Job rdbToMongoJob;
+	@Qualifier("storeBatchJob")
+	private final Job storeBatchJob;
 
-	/**
-	 * RDB to MongoDB 동기화 배치 작업을 수동으로 실행합니다.
-	 * POST /jobs/store-sync
-	 */
 	@PostMapping("/store-sync")
 	public ResponseEntity<Map<String, Object>> startBatchJob() {
 		Map<String, Object> response = new HashMap<>();
@@ -39,7 +37,7 @@ public class JobController {
 				.addString("jobId", UUID.randomUUID().toString())
 				.toJobParameters();
 
-			JobExecution jobExecution = jobLauncher.run(rdbToMongoJob, jobParameters);
+			JobExecution jobExecution = jobLauncher.run(storeBatchJob, jobParameters);
 
 			response.put("jobId", jobExecution.getJobId());
 			response.put("status", jobExecution.getStatus());

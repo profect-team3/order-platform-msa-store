@@ -41,7 +41,6 @@ public class StoreBatchProcessor implements ItemProcessor<StoreMenuDto, StoreCol
 		storeCollection.setCreatedAt(Date.from(dto.getCreatedAt().toInstant()));
 		storeCollection.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant()));
 
-		// JSON에서 메뉴 데이터 파싱
 		List<MenuCollection> menuCollections = new ArrayList<>();
 		if (dto.getMenuJson() != null && !dto.getMenuJson().trim().isEmpty() && !dto.getMenuJson().equals("[]")) {
 			try {
@@ -62,7 +61,6 @@ public class StoreBatchProcessor implements ItemProcessor<StoreMenuDto, StoreCol
 					})
 					.toList();
 			} catch (Exception e) {
-				// JSON 파싱 실패 시 빈 리스트로 설정
 				menuCollections = new ArrayList<>();
 			}
 		}

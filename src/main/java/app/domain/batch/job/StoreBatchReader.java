@@ -31,11 +31,10 @@ public class StoreBatchReader implements ItemReader<StoreMenuDto> {
 
         if (storeIterator != null && storeIterator.hasNext()) {
             StoreMenuDto current = storeIterator.next();
-            lastStoreId = current.getStoreId(); // 커서 업데이트
+            lastStoreId = current.getStoreId();
             return current;
         }
 
-        // 현재 배치가 끝났으면 다음 배치 로드
         List<StoreMenuDto> nextBatch = loadNextBatch();
         if (!nextBatch.isEmpty()) {
             storeIterator = nextBatch.iterator();
@@ -44,7 +43,7 @@ public class StoreBatchReader implements ItemReader<StoreMenuDto> {
             return current;
         }
 
-        return null; // 더 이상 데이터가 없음
+        return null;
     }
 
     private void initialize() {

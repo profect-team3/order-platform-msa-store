@@ -19,9 +19,20 @@ spring:
         show_sql: true
   data:
     mongodb:
-      uri: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/?authSource=admin
+      host: localhost
+      port: 27017
       database: store-db
-
+      username: ${MONGO_INITDB_ROOT_USERNAME}
+      password: ${MONGO_INITDB_ROOT_PASSWORD}
+      authentication-database: admin
+#    mongodb:
+#      uri: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/?authSource=admin
+#      database: store-db
+  batch:
+    job:
+      enabled=false:
+    jdbc:
+      initialize-schema: ALWAYS
 logging:
   level:
     org:

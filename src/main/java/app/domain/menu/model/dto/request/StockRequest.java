@@ -10,5 +10,5 @@ import java.util.UUID;
 public class StockRequest {
 
     private UUID menuId;
-    private Integer quantity;
+    private Long quantity;
 }

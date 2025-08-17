@@ -234,7 +234,7 @@ public class StoreService {
 		}
 		ApiResponse<String> updateOrderStatusResponse;
 		try{
-			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, "ACCEPTED");
 		} catch (HttpClientErrorException|HttpServerErrorException e){
 			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
@@ -260,7 +260,7 @@ public class StoreService {
 		}
 		ApiResponse<String> updateOrderStatusResponse;
 		try{
-			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, "REJECTED");
 		} catch (HttpClientErrorException|HttpServerErrorException e){
 			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);

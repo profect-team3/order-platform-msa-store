@@ -177,80 +177,93 @@ public class StoreService {
 		if (!store.getUserId().equals(userId)) {
 			throw new GeneralException(StoreErrorCode.INVALID_USER_ROLE);
 		}
-
+		ApiResponse<List<StoreOrderInfo>> storeOrderInfoResponse;
 		try{
-
-			ApiResponse<List<StoreOrderInfo>> storeOrderInfoResponse = orderClient.getOrdersByStoreId(storeId);
-
-			List<StoreOrderInfo> orders= storeOrderInfoResponse.result();
-			List<StoreOrderListResponse.StoreOrderDetail> orderDetails = orders.stream()
-				.map(orderInfo -> {
-					ApiResponse<String> getUserNameResponse =userClient.getUserName(orderInfo.getCustomerId());
-					if(!getUserNameResponse.isSuccess()){
-						throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
-					}
-
-					String customerName = getUserNameResponse.result();
-					return new StoreOrderListResponse.StoreOrderDetail(
-						orderInfo.getOrderId(),
-						orderInfo.getCustomerId(),
-						customerName,
-						orderInfo.getTotalPrice(),
-						orderInfo.getOrderStatus(),
-						orderInfo.getOrderedAt()
-					);
-				})
-				.collect(Collectors.toList());
-
-			return new StoreOrderListResponse(store.getStoreId(), orderDetails);
+			storeOrderInfoResponse= orderClient.getOrdersByStoreId(storeId);
 		} catch (HttpServerErrorException | HttpClientErrorException e){
-			log.error("Order Service Error: {}",e.getResponseBodyAsString());
-			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
+			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
 		}
+
+		List<StoreOrderInfo> orders= storeOrderInfoResponse.result();
+		List<StoreOrderListResponse.StoreOrderDetail> orderDetails = orders.stream()
+			.map(orderInfo -> {
+				ApiResponse<String> getUserNameResponse;
+				try{
+					getUserNameResponse =userClient.getUserName(orderInfo.getCustomerId());
+				} catch (HttpClientErrorException | HttpServerErrorException e){
+					log.error("User Service Error: {}", e.getResponseBodyAsString());
+					throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
+				}
+
+				String customerName = getUserNameResponse.result();
+				return new StoreOrderListResponse.StoreOrderDetail(
+					orderInfo.getOrderId(),
+					orderInfo.getCustomerId(),
+					customerName,
+					orderInfo.getTotalPrice(),
+					orderInfo.getOrderStatus(),
+					orderInfo.getOrderedAt()
+				);
+			})
+			.collect(Collectors.toList());
+
+		return new StoreOrderListResponse(store.getStoreId(), orderDetails);
+
 
 
 	}
 
 	@Transactional
 	public void acceptOrder(UUID orderId, Long userId) {
-		try{
-			ApiResponse<OrderInfo> orderInfoResponse = orderClient.getOrderInfo(orderId);
-
-			OrderInfo orderInfo=orderInfoResponse.result();
-
-			Store store = storeRepository.findById(orderInfo.getStoreId())
-				.orElseThrow(() -> new GeneralException(StoreErrorCode.STORE_NOT_FOUND));
-
-			if (!store.getUserId().equals(userId)) {
-				throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
-			}
-
-			ApiResponse<String> updateOrderStatusResponse =orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+		ApiResponse<OrderInfo> orderInfoResponse;
+		try {
+			orderInfoResponse = orderClient.getOrderInfo(orderId);
 		} catch (HttpClientErrorException|HttpServerErrorException e){
-			log.error("Order Service Error: {}",e.getResponseBodyAsString());
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
 		}
 
+		OrderInfo orderInfo=orderInfoResponse.result();
 
+		Store store = storeRepository.findById(orderInfo.getStoreId())
+			.orElseThrow(() -> new GeneralException(StoreErrorCode.STORE_NOT_FOUND));
+
+		if (!store.getUserId().equals(userId)) {
+			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
+		}
+		ApiResponse<String> updateOrderStatusResponse;
+		try{
+			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@Transactional
 	public void rejectOrder(UUID orderId, Long userId) {
-		try{
-			ApiResponse<OrderInfo> orderInfoResponse = orderClient.getOrderInfo(orderId);
-			OrderInfo orderInfo=orderInfoResponse.result();
-
-			Store store = storeRepository.findById(orderInfo.getStoreId())
-				.orElseThrow(() -> new GeneralException(StoreErrorCode.STORE_NOT_FOUND));
-
-			if (!store.getUserId().equals(userId)) {
-				throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
-			}
-
-			ApiResponse<String> updateOrderStatusResponse =orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
-		} catch (HttpServerErrorException | HttpClientErrorException e){
-			log.error("Order Service Error: {}",e.getResponseBodyAsString());
+		ApiResponse<OrderInfo> orderInfoResponse;
+		try {
+			orderInfoResponse = orderClient.getOrderInfo(orderId);
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
+		}
+		OrderInfo orderInfo=orderInfoResponse.result();
+
+		Store store = storeRepository.findById(orderInfo.getStoreId())
+			.orElseThrow(() -> new GeneralException(StoreErrorCode.STORE_NOT_FOUND));
+
+		if (!store.getUserId().equals(userId)) {
+			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
+		}
+		ApiResponse<String> updateOrderStatusResponse;
+		try{
+			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
 		}
 	}
 }

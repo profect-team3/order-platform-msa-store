@@ -25,6 +25,7 @@ public class StoreCollection {
 	private List<String> categoryKeys;
 	private String primaryCategory;
 	private Double avgRating;
+	private Long reviewCount;
 	private String phoneNumber;
 	private Long minOrderAmount;
 	private String address;
@@ -36,6 +37,8 @@ public class StoreCollection {
 	private Date createdAt;
 	@Indexed
 	private Date updatedAt;
+	private Date deletedAt;
+
 	@Field("version")
 	private Long version;
 	private List<MenuCollection> menus;

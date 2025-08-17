@@ -38,12 +38,19 @@ VALUES (now(), NULL, NULL, NULL, 5000,
         '87654321-fedc-ba98-7654-3210fedcba08', '010-1234-5978', 'BHC 치킨', '서울특별시 강남구 테헤란로 125',
         '매일 신선한 재료로 만드는 치킨 전문점입니다.', 'APPROVE');
 
+
 -- 메뉴
-INSERT INTO p_menu ("created_at", "updated_at", "menu_id", "store_id", "name", "description", "price", "is_hidden")
+INSERT INTO p_menu ("created_at", "updated_at", "menu_id", "store_id", "name", "description", "price", "is_hidden", "category_id")
 VALUES (now(), now(), 'd56e1bb1-a709-4772-b7da-a1b2b88af9c1', '87654321-fedc-ba98-7654-3210fedcba98', '허니콤보',
         '꿀맛 허니 콤보',
-        23000, FALSE);
+        23000, FALSE, '6530a750-89b7-44af-aebc-0e008fbeccd7');
 
---장바구니
-INSERT INTO p_cart ("created_at", "updated_at","user_id","cart_id")
-VALUES (now(),now(),1,'d56e7bb1-a709-4772-b7da-a1b2b88af9c1');
+
+-- 오더 생성
+INSERT INTO p_orders("created_at", "updated_at", "is_refundable", "total_price", "orders_id", "store_id", "order_channel", "order_status", "receipt_method", "payment_method", "delivery_address", "order_history" , "user_id")
+VALUES (now(), now(), 'false', 1, '87654321-fedc-ba98-7654-3210feabba98', '87654321-fedc-ba98-7654-3210fedcba98', 'ONLINE',
+        'COMPLETED', 'DELIVERY', 'CREDIT_CARD', '서울특별시 강남구 테헤란로 125', 'sample text', 1);
+
+-- 리뷰 생성
+INSERT INTO p_review("created_at", "updated_at", "rating", "user_id", "b_order_id", "review_id", "store_id", "content")
+VALUES (now(), now(), 5, 1, '87654321-fedc-ba98-7654-3210feabba98', '87654321-fedc-ba98-7654-3210feabba28', '87654321-fedc-ba98-7654-3210fedcba98', '맛있고 배달이 빨랐어요!');

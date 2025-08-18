@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.domain.store.service.ManagerService;
 import app.domain.store.model.dto.response.GetStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.status.ManagerSuccessStatus;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/manager")
 @RequiredArgsConstructor
 @Tag(name = "관리자 API", description = "관리자의 사용자 관리 API")
+@PreAuthorize("hasRole('MANAGER')")
 public class ManagerController {
 
 	private final ManagerService managerService;

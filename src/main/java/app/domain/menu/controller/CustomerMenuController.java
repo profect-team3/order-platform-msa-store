@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
@@ -6,11 +6,13 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.domain.menu.service.CustomerMenuService;
 import app.domain.menu.model.dto.response.GetMenuListResponse;
 import app.domain.menu.status.StoreMenuSuccessStatus;
 import app.global.apiPayload.ApiResponse;
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/menu")
 @RequiredArgsConstructor
 @Tag(name = "사용자 API", description = "사용자의 메뉴관련 API")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class CustomerMenuController {
 
 	private final CustomerMenuService customerMenuService;

@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.service;
 
 import java.util.Map;
 import java.util.UUID;

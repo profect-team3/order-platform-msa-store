@@ -1,4 +1,9 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${OAUTH_JWKS_URI:http://localhost:8083/oauth/jwks}
   application:
     name: store
   config:
@@ -41,6 +46,11 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+
+
+jwt:
+  audience:  ${AUTH_INTERNAL_AUDIENCE:internal-services}
+
 discord:
   webhook:
     url: ${DISCORD_URL}

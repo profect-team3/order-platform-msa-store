@@ -141,7 +141,7 @@ public class StoreMenuService {
 			.orElseThrow(() -> new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND));
 
 		if (!menu.getStore().getUserId().equals(userId)) {
-			throw new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND);
+			throw new GeneralException(StoreMenuErrorCode.NOT_STORE_OWNER);
 		}
 
 		Stock stock = stockRepository.findByMenu_MenuId(request.getMenuId())

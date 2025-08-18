@@ -2,6 +2,8 @@ package app.domain.batch.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 import java.util.UUID;
 import java.sql.Timestamp;
 
@@ -19,12 +21,10 @@ public class BulkDto {
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
-
+	private List<String> categoryKeys;
 	private String regionName;
 	private String regionFullName;
-	private String categoryName;
 	private String menuJson;
 	private Long reviewCount;
 	private Double avgRating;
-
 }

@@ -35,6 +35,8 @@ public class BulkRepositoryImpl implements BulkRepository {
         QRegion region = QRegion.region;
         QCategory category = QCategory.category;
         QReview review = QReview.review;
+        QCategory parentCategory = new QCategory("parentCategory");
+        QCategory grandparentCategory = new QCategory("grandparentCategory");
 
         com.querydsl.core.types.Expression<Double> avgRatingExpr = JPAExpressions.select(review.rating.avg().coalesce(0.0))
                 .from(review)
@@ -60,12 +62,16 @@ public class BulkRepositoryImpl implements BulkRepository {
                         region.regionName,
                         region.fullName,
                         category.categoryName,
+                        parentCategory.categoryName,
+                        grandparentCategory.categoryName,
                         avgRatingExpr,
                         reviewCountExpr
                 )
                 .from(s)
                 .join(s.region, region)
                 .join(s.category, category)
+                .leftJoin(category.parentCategory, parentCategory)
+                .leftJoin(parentCategory.parentCategory, grandparentCategory)
                 .where(lastStoreId == null ? Expressions.TRUE : s.storeId.gt(lastStoreId))
                 .orderBy(s.storeId.asc())
                 .limit(limit)
@@ -88,7 +94,16 @@ public class BulkRepositoryImpl implements BulkRepository {
             }
             dto.setRegionName(tuple.get(region.regionName));
             dto.setRegionFullName(tuple.get(region.fullName));
-            dto.setCategoryName(tuple.get(category.categoryName));
+            String categoryName = tuple.get(category.categoryName);
+            String parentCategoryName = tuple.get(parentCategory.categoryName);
+            String grandparentCategoryName = tuple.get(grandparentCategory.categoryName);
+
+            List<String> categoryKeys = new java.util.ArrayList<>();
+            if (grandparentCategoryName != null) categoryKeys.add(grandparentCategoryName);
+            if (parentCategoryName != null) categoryKeys.add(parentCategoryName);
+            categoryKeys.add(categoryName);
+            dto.setCategoryKeys(categoryKeys);
+
             dto.setAvgRating(tuple.get(avgRatingExpr));
             dto.setReviewCount(tuple.get(reviewCountExpr));
             return dto;

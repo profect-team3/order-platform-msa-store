@@ -28,8 +28,7 @@ public class BulkProcessor implements ItemProcessor<BulkDto, StoreCollection> {
 		storeCollection.setUserId(dto.getUserId());
 		storeCollection.setStoreName(dto.getStoreName());
 		storeCollection.setDescription(dto.getDescription());
-		storeCollection.setCategoryKeys(List.of(dto.getCategoryName()));
-		storeCollection.setPrimaryCategory(dto.getCategoryName());
+		storeCollection.setCategoryKeys(dto.getCategoryKeys());
 		storeCollection.setReviewCount(dto.getReviewCount());
 		storeCollection.setAvgRating(dto.getAvgRating());
 		storeCollection.setPhoneNumber(dto.getPhoneNumber());
@@ -38,6 +37,7 @@ public class BulkProcessor implements ItemProcessor<BulkDto, StoreCollection> {
 		storeCollection.setRegionName(dto.getRegionName());
 		storeCollection.setRegionFullName(dto.getRegionFullName());
 		storeCollection.setStoreAcceptStatus(dto.getStoreAcceptStatus());
+		storeCollection.setIsActive(dto.getStoreAcceptStatus().equals("APPROVE"));
 		storeCollection.setCreatedAt(Date.from(dto.getCreatedAt().toInstant()));
 		storeCollection.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant()));
 

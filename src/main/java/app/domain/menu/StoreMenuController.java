@@ -18,6 +18,7 @@ import app.domain.menu.model.dto.request.MenuDeleteRequest;
 import app.domain.menu.model.dto.request.MenuListRequest;
 import app.domain.menu.model.dto.request.MenuUpdateRequest;
 import app.domain.menu.model.dto.request.MenuVisibleRequest;
+import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.dto.response.MenuCreateResponse;
 import app.domain.menu.model.dto.response.MenuDeleteResponse;
 import app.domain.menu.model.dto.response.MenuListResponse;
@@ -30,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Store", description = "가게, 가게 메뉴 관리")
 @RestController
-@RequestMapping("/store")
+@RequestMapping()
 @RequiredArgsConstructor
 public class StoreMenuController {
 
@@ -68,4 +69,11 @@ public class StoreMenuController {
 		MenuListResponse response = storeMenuService.getMenuList(request);
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus._OK, response);
 	}
+
+	@PutMapping("/menu/stock")
+	public ApiResponse<MenuUpdateResponse> updateStock(@Valid @RequestBody StockRequest request, @RequestHeader("UserID") Long userId) {
+		MenuUpdateResponse response = storeMenuService.updateStock(request, userId);
+		return ApiResponse.onSuccess(StoreMenuSuccessStatus.STOCK_UPDATED_SUCCESS, response);
+	}
+
 }

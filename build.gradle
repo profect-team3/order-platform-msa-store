@@ -61,6 +61,7 @@ dependencies {
 
     // (선택) 메서드 보안 @PreAuthorize 쓰면 안정적으로 AOP 포함 추천
     implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 clean {

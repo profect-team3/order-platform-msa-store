@@ -51,5 +51,8 @@ logging:
 jwt:
   audience:  ${AUTH_INTERNAL_AUDIENCE:internal-services}
 
+discord:
+  webhook:
+    url: ${DISCORD_URL}
 server:
   port: 8082

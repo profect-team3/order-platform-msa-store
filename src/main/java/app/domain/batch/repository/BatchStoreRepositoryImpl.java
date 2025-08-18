@@ -1,81 +1,135 @@
 package app.domain.batch.repository;
 
 import app.domain.batch.dto.StoreMenuDto;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import app.domain.menu.model.entity.Menu;
+import app.domain.menu.model.entity.QCategory;
+import app.domain.menu.model.entity.QMenu;
+import app.domain.store.model.entity.QRegion;
+import app.domain.store.model.entity.QReview;
+import app.domain.store.model.entity.QStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
 public class BatchStoreRepositoryImpl implements BatchStoreRepository {
 
     private final EntityManager entityManager;
+    private final ObjectMapper objectMapper;
 
     @Override
     public List<StoreMenuDto> findStoresWithDetailsCursor(UUID lastStoreId, int limit) {
-        String sql = """
-            SELECT s.store_id, s.user_id, s.store_name, s.description, s.min_order_amount, 
-                   s.address, s.phone_number, s.store_accept_status, s.created_at, s.updated_at, s.deleted_at,
-                   r.region_name, r.full_name as region_full_name, c.category_name,
-                   (SELECT COALESCE(AVG(rv.rating), 0.0) 
-                    FROM p_review rv 
-                    WHERE rv.store_id = s.store_id AND rv.deleted_at IS NULL) AS avg_rating,
-                   (SELECT COUNT(*) FROM p_review rv WHERE rv.store_id = s.store_id AND rv.deleted_at IS NULL) AS review_count,
-                   (SELECT COALESCE(
-                       json_agg(json_build_object(
-                           'menuId', m.menu_id, 
-                           'name', m.name, 
-                           'price', m.price, 
-                           'description', m.description, 
-                           'isHidden', m.is_hidden
-                       )),
-                       '[]'::json
-                   )
-                    FROM p_menu m 
-                    WHERE m.store_id = s.store_id AND m.deleted_at IS NULL) AS menu_json
-            FROM p_store s 
-            JOIN p_region r ON s.region_id = r.region_id 
-            JOIN p_category c ON s.category_id = c.category_id 
-            WHERE (CAST(:lastStoreId AS uuid) IS NULL OR s.store_id > CAST(:lastStoreId AS uuid))
-            ORDER BY s.store_id
-            LIMIT :limit""";
+        QStore s = QStore.store;
+        QRegion region = QRegion.region;
+        QCategory category = QCategory.category;
+        QReview review = QReview.review;
 
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("lastStoreId", lastStoreId);
-        query.setParameter("limit", limit);
+        com.querydsl.core.types.Expression<Double> avgRatingExpr = JPAExpressions.select(review.rating.avg().coalesce(0.0))
+                .from(review)
+                .where(review.store.eq(s.storeId).and(review.deletedAt.isNull()));
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> results = query.getResultList();
-        
-        return results.stream()
-            .map(this::mapToStoreMenuDto)
-            .toList();
-    }
+        com.querydsl.core.types.Expression<Long> reviewCountExpr = JPAExpressions.select(review.count())
+                .from(review)
+                .where(review.store.eq(s.storeId).and(review.deletedAt.isNull()));
 
-    private StoreMenuDto mapToStoreMenuDto(Object[] row) {
-        StoreMenuDto dto = new StoreMenuDto();
-        dto.setStoreId((UUID) row[0]);
-        dto.setUserId(((Number) row[1]).longValue());
-        dto.setStoreName((String) row[2]);
-        dto.setDescription((String) row[3]);
-        dto.setMinOrderAmount(((Number) row[4]).longValue());
-        dto.setAddress((String) row[5]);
-        dto.setPhoneNumber((String) row[6]);
-        dto.setStoreAcceptStatus((String) row[7]);
-        dto.setCreatedAt((Timestamp) row[8]);
-        dto.setUpdatedAt((Timestamp) row[9]);
-        dto.setDeletedAt((Timestamp) row[10]);
-        dto.setRegionName((String) row[11]);
-        dto.setRegionFullName((String) row[12]);
-        dto.setCategoryName((String) row[13]);
-        dto.setAvgRating(((Number) row[14]).doubleValue());
-        dto.setReviewCount(((Number) row[15]).longValue());
-        dto.setMenuJson((String) row[16]);
-        return dto;
+        List<com.querydsl.core.Tuple> tuples = new JPAQuery<>(entityManager)
+                .select(
+                        s.storeId,
+                        s.userId,
+                        s.storeName,
+                        s.description,
+                        s.minOrderAmount,
+                        s.address,
+                        s.phoneNumber,
+                        s.storeAcceptStatus,
+                        s.createdAt,
+                        s.updatedAt,
+                        s.deletedAt,
+                        region.regionName,
+                        region.fullName,
+                        category.categoryName,
+                        avgRatingExpr,
+                        reviewCountExpr
+                )
+                .from(s)
+                .join(s.region, region)
+                .join(s.category, category)
+                .where(lastStoreId == null ? Expressions.TRUE : s.storeId.gt(lastStoreId))
+                .orderBy(s.storeId.asc())
+                .limit(limit)
+                .fetch();
+
+        List<StoreMenuDto> stores = tuples.stream().map(tuple -> {
+            StoreMenuDto dto = new StoreMenuDto();
+            dto.setStoreId(tuple.get(s.storeId));
+            dto.setUserId(tuple.get(s.userId));
+            dto.setStoreName(tuple.get(s.storeName));
+            dto.setDescription(tuple.get(s.description));
+            dto.setMinOrderAmount(tuple.get(s.minOrderAmount));
+            dto.setAddress(tuple.get(s.address));
+            dto.setPhoneNumber(tuple.get(s.phoneNumber));
+            dto.setStoreAcceptStatus(tuple.get(s.storeAcceptStatus).toString());
+            dto.setCreatedAt(java.sql.Timestamp.valueOf(tuple.get(s.createdAt)));
+            dto.setUpdatedAt(java.sql.Timestamp.valueOf(tuple.get(s.updatedAt)));
+            if (tuple.get(s.deletedAt) != null) {
+                dto.setDeletedAt(java.sql.Timestamp.valueOf(tuple.get(s.deletedAt)));
+            }
+            dto.setRegionName(tuple.get(region.regionName));
+            dto.setRegionFullName(tuple.get(region.fullName));
+            dto.setCategoryName(tuple.get(category.categoryName));
+            dto.setAvgRating(tuple.get(avgRatingExpr));
+            dto.setReviewCount(tuple.get(reviewCountExpr));
+            return dto;
+        }).collect(Collectors.toList());
+
+        if (stores.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> storeIds = stores.stream().map(StoreMenuDto::getStoreId).toList();
+        QMenu menu = QMenu.menu;
+        List<Menu> menus = new JPAQuery<>(entityManager)
+                .select(menu)
+                .from(menu)
+                .where(menu.store.storeId.in(storeIds).and(menu.deletedAt.isNull()))
+                .fetch();
+
+        Map<UUID, List<Menu>> menusByStoreId = menus.stream()
+                .collect(Collectors.groupingBy(m -> m.getStore().getStoreId()));
+
+        return stores.stream()
+                .map(dto -> {
+                    List<Menu> storeMenus = menusByStoreId.getOrDefault(dto.getStoreId(), List.of());
+                    try {
+                        String menuJson = objectMapper.writeValueAsString(
+                                storeMenus.stream()
+                                        .map(m -> Map.of(
+                                                "menuId", m.getMenuId().toString(),
+                                                "name", m.getName(),
+                                                "price", m.getPrice(),
+                                                "description", m.getDescription(),
+                                                "isHidden", m.isHidden()
+                                        ))
+                                        .toList()
+                        );
+                        dto.setMenuJson(menuJson);
+                    } catch (Exception e) {
+                        dto.setMenuJson("[]");
+                    }
+                    return dto;
+                })
+                .toList();
     }
 }

@@ -1,5 +1,6 @@
 package app.domain.menu.internal;
 
+import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.dto.response.MenuInfoResponse;
 import app.domain.menu.status.StoreMenuSuccessStatus;
 import app.global.apiPayload.ApiResponse;
@@ -21,5 +22,11 @@ public class InternalMenuController {
 	@PostMapping("/batch")
 	public ApiResponse<List<MenuInfoResponse>> getMenuInfoList(@RequestBody List<UUID> menuIds) {
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_INFO_BATCH_SUCCESS,internalMenuService.getMenuInfoList(menuIds));
+	}
+
+	@PostMapping("/stocks/decrease")
+	public ApiResponse<Boolean> decreaseStock(@RequestBody List<StockRequest> requests) {
+		boolean result = internalMenuService.decreaseStock(requests);
+		return ApiResponse.onSuccess(StoreMenuSuccessStatus.STOCK_DECREASE_SUCCESS, result);
 	}
 }

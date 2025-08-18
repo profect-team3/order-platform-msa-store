@@ -21,6 +21,7 @@ import app.domain.menu.model.dto.request.MenuDeleteRequest;
 import app.domain.menu.model.dto.request.MenuListRequest;
 import app.domain.menu.model.dto.request.MenuUpdateRequest;
 import app.domain.menu.model.dto.request.MenuVisibleRequest;
+import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.dto.response.MenuCreateResponse;
 import app.domain.menu.model.dto.response.MenuDeleteResponse;
 import app.domain.menu.model.dto.response.MenuListResponse;
@@ -73,4 +74,11 @@ public class StoreMenuController {
 		MenuListResponse response = storeMenuService.getMenuList(request);
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus._OK, response);
 	}
+
+	@PutMapping("/menu/stock")
+	public ApiResponse<MenuUpdateResponse> updateStock(@Valid @RequestBody StockRequest request, @RequestHeader("UserID") Long userId) {
+		MenuUpdateResponse response = storeMenuService.updateStock(request, userId);
+		return ApiResponse.onSuccess(StoreMenuSuccessStatus.STOCK_UPDATED_SUCCESS, response);
+	}
+
 }

@@ -11,14 +11,17 @@ import app.domain.menu.model.dto.request.MenuCreateRequest;
 import app.domain.menu.model.dto.request.MenuDeleteRequest;
 import app.domain.menu.model.dto.request.MenuListRequest;
 import app.domain.menu.model.dto.request.MenuUpdateRequest;
+import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.dto.response.MenuCreateResponse;
 import app.domain.menu.model.dto.response.MenuDeleteResponse;
 import app.domain.menu.model.dto.response.MenuListResponse;
 import app.domain.menu.model.dto.response.MenuUpdateResponse;
 import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.entity.Menu;
+import app.domain.menu.model.entity.Stock;
 import app.domain.menu.model.repository.CategoryRepository;
 import app.domain.menu.model.repository.MenuRepository;
+import app.domain.menu.model.repository.StockRepository;
 import app.domain.menu.status.StoreMenuErrorCode;
 import app.domain.store.model.entity.Store;
 import app.domain.store.repository.StoreRepository;
@@ -32,6 +35,7 @@ public class StoreMenuService {
 
 	private final MenuRepository menuRepository;
 	private final StoreRepository storeRepository;
+	private final StockRepository stockRepository;
 	private final CategoryRepository categoryRepository;
 
 	@Transactional
@@ -129,5 +133,23 @@ public class StoreMenuService {
 			.collect(Collectors.toList());
 
 		return new MenuListResponse(store.getStoreId(), menuDetails);
+	}
+
+	@Transactional
+	public MenuUpdateResponse updateStock(StockRequest request, Long userId) {
+		Menu menu = menuRepository.findByMenuIdAndDeletedAtIsNull(request.getMenuId())
+			.orElseThrow(() -> new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND));
+
+		if (!menu.getStore().getUserId().equals(userId)) {
+			throw new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND);
+		}
+
+		Stock stock = stockRepository.findByMenu_MenuId(request.getMenuId())
+			.orElse(Stock.builder().menu(menu).stock(0L).build());
+
+		stock.setStock(request.getQuantity());
+		stockRepository.save(stock);
+
+		return new MenuUpdateResponse(menu.getMenuId(), menu.getName());
 	}
 }

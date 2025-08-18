@@ -1,7 +1,7 @@
 package app.domain.batch;
 
-import app.domain.batch.dto.StoreMenuDto;
-import app.domain.batch.repository.BatchStoreRepositoryImpl;
+import app.domain.batch.dto.BulkDto;
+import app.domain.batch.repository.BulkRepositoryImpl;
 import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.entity.Menu;
 import app.domain.store.model.entity.Region;
@@ -34,7 +34,7 @@ class BulkStoreRepositoryTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private BatchStoreRepositoryImpl batchStoreRepository;
+    private BulkRepositoryImpl batchStoreRepository;
 
     private Region region;
     private Category category;
@@ -42,7 +42,7 @@ class BulkStoreRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        batchStoreRepository = new BatchStoreRepositoryImpl(em.getEntityManager(), objectMapper);
+        batchStoreRepository = new BulkRepositoryImpl(em.getEntityManager(), objectMapper);
 
         region = Region.builder().regionCode("11680").regionName("서울").fullName("서울특별시 강남구").build();
         em.persist(region);
@@ -68,11 +68,11 @@ class BulkStoreRepositoryTest {
     @Test
     @DisplayName("가게, 메뉴, 리뷰 정보를 올바르게 조회하는지 테스트")
     void testFindStoresWithDetailsCursor() throws Exception {
-        List<StoreMenuDto> results = batchStoreRepository.findStoresWithDetailsCursor(null, 10);
+        List<BulkDto> results = batchStoreRepository.findStoresWithDetailsCursor(null, 10);
 
         assertEquals(2, results.size());
 
-        StoreMenuDto dto1 = results.stream().filter(s -> s.getStoreId().equals(store1.getStoreId())).findFirst().orElse(null);
+        BulkDto dto1 = results.stream().filter(s -> s.getStoreId().equals(store1.getStoreId())).findFirst().orElse(null);
         assertNotNull(dto1);
         assertEquals("테스트치킨집1", dto1.getStoreName());
         assertEquals(2L, dto1.getReviewCount());
@@ -82,7 +82,7 @@ class BulkStoreRepositoryTest {
         assertEquals(2, menus1.size());
         assertTrue(menus1.stream().anyMatch(m -> m.get("name").equals("후라이드")));
 
-        StoreMenuDto dto2 = results.stream().filter(s -> s.getStoreId().equals(store2.getStoreId())).findFirst().orElse(null);
+        BulkDto dto2 = results.stream().filter(s -> s.getStoreId().equals(store2.getStoreId())).findFirst().orElse(null);
         assertNotNull(dto2);
         assertEquals("테스트치킨집2", dto2.getStoreName());
         assertEquals(1L, dto2.getReviewCount());

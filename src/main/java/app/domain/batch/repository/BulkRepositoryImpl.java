@@ -1,7 +1,7 @@
 package app.domain.batch.repository;
 
-import app.domain.batch.dto.StoreMenuDto;
-import com.querydsl.core.types.Projections;
+import app.domain.batch.dto.BulkDto;
+
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -24,13 +24,13 @@ import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-public class BatchStoreRepositoryImpl implements BatchStoreRepository {
+public class BulkRepositoryImpl implements BulkRepository {
 
     private final EntityManager entityManager;
     private final ObjectMapper objectMapper;
 
     @Override
-    public List<StoreMenuDto> findStoresWithDetailsCursor(UUID lastStoreId, int limit) {
+    public List<BulkDto> findStoresWithDetailsCursor(UUID lastStoreId, int limit) {
         QStore s = QStore.store;
         QRegion region = QRegion.region;
         QCategory category = QCategory.category;
@@ -71,8 +71,8 @@ public class BatchStoreRepositoryImpl implements BatchStoreRepository {
                 .limit(limit)
                 .fetch();
 
-        List<StoreMenuDto> stores = tuples.stream().map(tuple -> {
-            StoreMenuDto dto = new StoreMenuDto();
+        List<BulkDto> stores = tuples.stream().map(tuple -> {
+            BulkDto dto = new BulkDto();
             dto.setStoreId(tuple.get(s.storeId));
             dto.setUserId(tuple.get(s.userId));
             dto.setStoreName(tuple.get(s.storeName));
@@ -98,7 +98,7 @@ public class BatchStoreRepositoryImpl implements BatchStoreRepository {
             return List.of();
         }
 
-        List<UUID> storeIds = stores.stream().map(StoreMenuDto::getStoreId).toList();
+        List<UUID> storeIds = stores.stream().map(BulkDto::getStoreId).toList();
         QMenu menu = QMenu.menu;
         List<Menu> menus = new JPAQuery<>(entityManager)
                 .select(menu)

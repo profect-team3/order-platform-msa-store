@@ -23,7 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/jobs")
 @RequiredArgsConstructor
-public class JobController {
+public class BulkController {
 
 	private final JobLauncher jobLauncher;
 	@Qualifier("storeBatchJob")

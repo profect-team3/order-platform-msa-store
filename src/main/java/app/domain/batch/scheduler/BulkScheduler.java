@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class BatchScheduler {
+public class BulkScheduler {
 
     private final JobLauncher jobLauncher;
     @Qualifier("storeBatchJob")

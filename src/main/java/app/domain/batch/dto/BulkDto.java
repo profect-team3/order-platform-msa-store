@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 
 @Getter
 @Setter
-public class StoreMenuDto {
+public class BulkDto {
 	private UUID storeId;
 	private Long userId;
 	private String storeName;

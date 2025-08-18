@@ -14,7 +14,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Component
 @RequiredArgsConstructor
-public class StoreBatchWriter implements ItemWriter<StoreCollection> {
+public class BulkWriter implements ItemWriter<StoreCollection> {
 
 	private final MongoTemplate mongoTemplate;
 

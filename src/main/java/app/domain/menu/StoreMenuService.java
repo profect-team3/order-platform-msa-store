@@ -15,7 +15,9 @@ import app.domain.menu.model.dto.response.MenuCreateResponse;
 import app.domain.menu.model.dto.response.MenuDeleteResponse;
 import app.domain.menu.model.dto.response.MenuListResponse;
 import app.domain.menu.model.dto.response.MenuUpdateResponse;
+import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.entity.Menu;
+import app.domain.menu.model.repository.CategoryRepository;
 import app.domain.menu.model.repository.MenuRepository;
 import app.domain.menu.status.StoreMenuErrorCode;
 import app.domain.store.model.entity.Store;
@@ -30,11 +32,15 @@ public class StoreMenuService {
 
 	private final MenuRepository menuRepository;
 	private final StoreRepository storeRepository;
+	private final CategoryRepository categoryRepository;
 
 	@Transactional
 	public MenuCreateResponse createMenu(MenuCreateRequest request, Long userId) {
 		Store store = storeRepository.findById(request.getStoreId())
 			.orElseThrow(() -> new GeneralException(StoreMenuErrorCode.STORE_NOT_FOUND_FOR_MENU));
+
+		Category category = categoryRepository.findById(request.getCategoryId())
+			.orElseThrow(() -> new GeneralException(StoreMenuErrorCode.MENU_CATEGORY_NOT_FOUND));
 
 		if (!store.getUserId().equals(userId)) {
 			throw new GeneralException(StoreErrorCode.INVALID_USER_ROLE);
@@ -44,7 +50,7 @@ public class StoreMenuService {
 			throw new GeneralException(StoreMenuErrorCode.MENU_NAME_DUPLICATE);
 		}
 
-		Menu menu = new Menu(null, store, request.getName(), request.getPrice(), request.getDescription(), false, null, null);
+		Menu menu = new Menu(null, store, request.getName(), request.getPrice(), request.getDescription(), false, category, null);
 
 		Menu savedMenu = menuRepository.save(menu);
 

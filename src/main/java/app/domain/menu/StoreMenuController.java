@@ -2,6 +2,8 @@ package app.domain.menu;
 
 import java.util.UUID;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.commonSecurity.TokenPrincipalParser;
 import app.domain.menu.model.dto.request.MenuCreateRequest;
 import app.domain.menu.model.dto.request.MenuDeleteRequest;
 import app.domain.menu.model.dto.request.MenuListRequest;
@@ -30,35 +33,37 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Store", description = "가게, 가게 메뉴 관리")
 @RestController
-@RequestMapping("/store")
+@RequestMapping("/owner")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('OWNER')")
 public class StoreMenuController {
 
 	private final StoreMenuService storeMenuService;
+	private final TokenPrincipalParser tokenPrincipalParser;
 
 	@PostMapping("/menu")
-	public ApiResponse<MenuCreateResponse> createMenu(@Valid @RequestBody MenuCreateRequest request, @RequestHeader("UserID") Long userId) {
-		MenuCreateResponse response = storeMenuService.createMenu(request, userId);
+	public ApiResponse<MenuCreateResponse> createMenu(@Valid @RequestBody MenuCreateRequest request, Authentication authentication) {
+		MenuCreateResponse response = storeMenuService.createMenu(request, 	Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_CREATED_SUCCESS, response);
 	}
 
 	@PutMapping("/menu")
-	public ApiResponse<MenuUpdateResponse> updateMenu(@Valid @RequestBody MenuUpdateRequest request, @RequestHeader("UserID") Long userId) {
-		MenuUpdateResponse response = storeMenuService.updateMenu(request, userId);
+	public ApiResponse<MenuUpdateResponse> updateMenu(@Valid @RequestBody MenuUpdateRequest request, Authentication authentication) {
+		MenuUpdateResponse response = storeMenuService.updateMenu(request, 	Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_UPDATED_SUCCESS, response);
 	}
 
 	@DeleteMapping("/menu/delete")
-	public ApiResponse<MenuDeleteResponse> deleteMenu(@Valid @RequestBody MenuDeleteRequest request, @RequestHeader("UserID") Long userId) {
-		MenuDeleteResponse response = storeMenuService.deleteMenu(request, userId);
+	public ApiResponse<MenuDeleteResponse> deleteMenu(@Valid @RequestBody MenuDeleteRequest request, Authentication authentication) {
+		MenuDeleteResponse response = storeMenuService.deleteMenu(request, 	Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_DELETED_SUCCESS, response);
 	}
 
 	@PutMapping("/menu/{menuId}/visible")
 	public ApiResponse<MenuUpdateResponse> updateMenuVisibility(@PathVariable UUID menuId,
-		@Valid @RequestBody MenuVisibleRequest request, @RequestHeader("UserID") Long userId) {
+		@Valid @RequestBody MenuVisibleRequest request, Authentication authentication) {
 		MenuUpdateResponse response = storeMenuService.updateMenuVisibility(menuId,
-			request.getVisible(), userId);
+			request.getVisible(), 	Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_UPDATED_SUCCESS, response);
 	}
 

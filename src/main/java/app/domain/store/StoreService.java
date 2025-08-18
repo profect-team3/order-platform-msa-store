@@ -49,7 +49,7 @@ public class StoreService {
 	@Transactional
 	public StoreApproveResponse createStore(StoreApproveRequest request, Long userId) {
 
-		ApiResponse<Boolean> isUserExistsResponse = userClient.isUserExists(userId);
+		ApiResponse<Boolean> isUserExistsResponse = userClient.isUserExists();
 
 		Boolean isUserExists=isUserExistsResponse.result();
 		if(!isUserExistsResponse.isSuccess()){
@@ -177,7 +177,7 @@ public class StoreService {
 		List<StoreOrderInfo> orders= storeOrderInfoResponse.result();
 		List<StoreOrderListResponse.StoreOrderDetail> orderDetails = orders.stream()
 			.map(orderInfo -> {
-				ApiResponse<String> getUserNameResponse =userClient.getUserName(orderInfo.getCustomerId());
+				ApiResponse<String> getUserNameResponse =userClient.getUserName();
 				if(!getUserNameResponse.isSuccess()){
 					throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
 				}

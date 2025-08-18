@@ -26,8 +26,8 @@ public class UserClient {
     @Value("${user.service.url:http://localhost:8081}")
     private String userServiceUrl;
 
-    public ApiResponse<Boolean> isUserExists(Long userId) {
-        String url = userServiceUrl + "/internal/user/"+userId+"/exists";
+    public ApiResponse<Boolean> isUserExists() {
+        String url = userServiceUrl + "/internal/user/exists";
 
         ResponseEntity<ApiResponse<Boolean>> response = restTemplate.exchange(
             url,
@@ -39,8 +39,8 @@ public class UserClient {
         return response.getBody();
     }
 
-    public ApiResponse<String> getUserName(Long userId) {
-        String url = userServiceUrl + "/internal/user/"+userId+"/name";
+    public ApiResponse<String> getUserName() {
+        String url = userServiceUrl + "/internal/user/name";
 
         ResponseEntity<ApiResponse<String>> response = restTemplate.exchange(
             url,
@@ -52,8 +52,8 @@ public class UserClient {
         return response.getBody();
     }
 
-    public ApiResponse<GetUserInfoResponse> getUserInfo(Long userId){
-        String url = userServiceUrl + "internal/user/"+userId+"/info";
+    public ApiResponse<GetUserInfoResponse> getUserInfo(){
+        String url = userServiceUrl + "internal/user/info";
 
         ResponseEntity<ApiResponse<GetUserInfoResponse>> response = restTemplate.exchange(
             url,

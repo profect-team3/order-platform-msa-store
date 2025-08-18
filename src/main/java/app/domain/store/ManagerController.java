@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/manager")
 @RequiredArgsConstructor
 @Tag(name = "관리자 API", description = "관리자의 사용자 관리 API")
+@PreAuthorize("hasRole('MANAGER')")
 public class ManagerController {
 
 	private final ManagerService managerService;

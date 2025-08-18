@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.service;
 
 import java.util.List;
 import java.util.UUID;
@@ -91,7 +91,7 @@ public class StoreMenuService {
 			.orElseThrow(() -> new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND));
 
 		if (!menu.getStore().getUserId().equals(userId)) {
-			throw new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND);
+			throw new GeneralException(StoreMenuErrorCode.USER_NOT_FOUND_FOR_MENU);
 		}
 
 		if (menu.getDeletedAt() != null) {
@@ -114,7 +114,7 @@ public class StoreMenuService {
 			throw new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND);
 		}
 
-		menu.update(null, null, null, visible);
+		menu.updateVisible(visible);
 		Menu updatedMenu = menuRepository.save(menu);
 
 		return new MenuUpdateResponse(updatedMenu.getMenuId(), updatedMenu.getName());

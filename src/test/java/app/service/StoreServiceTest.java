@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.repository.CategoryRepository;
 import app.domain.menu.model.repository.MenuRepository;
-import app.domain.store.StoreService;
+import app.domain.store.service.StoreService;
 import app.domain.store.client.OrderClient;
 import app.domain.store.client.ReviewClient;
 import app.domain.store.client.UserClient;

@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.controller;
 
 import java.util.UUID;
 
@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.domain.store.service.RegionService;
 import app.domain.store.status.StoreErrorCode;
 import app.domain.store.status.StoreSuccessStatus;
 import app.global.apiPayload.ApiResponse;

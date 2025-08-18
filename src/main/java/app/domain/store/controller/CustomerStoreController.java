@@ -1,9 +1,7 @@
-package app.domain.store;
+package app.domain.store.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
-
 import java.util.UUID;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.domain.store.service.CustomerStoreService;
 import app.domain.store.model.dto.response.GetCustomerStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.status.StoreAcceptStatus;

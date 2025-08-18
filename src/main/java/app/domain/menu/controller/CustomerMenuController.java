@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.domain.menu.service.CustomerMenuService;
 import app.domain.menu.model.dto.response.GetMenuListResponse;
 import app.domain.menu.status.StoreMenuSuccessStatus;
 import app.global.apiPayload.ApiResponse;

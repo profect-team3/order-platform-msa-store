@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.service;
 
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +54,7 @@ public class StoreService {
 	public StoreApproveResponse createStore(StoreApproveRequest request, Long userId) {
 
 		try {
-			ApiResponse<Boolean> isUserExistsResponse = userClient.isUserExists(userId);
+			ApiResponse<Boolean> isUserExistsResponse = userClient.isUserExists();
 
 			Boolean isUserExists=isUserExistsResponse.result();
 
@@ -190,7 +190,7 @@ public class StoreService {
 			.map(orderInfo -> {
 				ApiResponse<String> getUserNameResponse;
 				try{
-					getUserNameResponse =userClient.getUserName(orderInfo.getCustomerId());
+					getUserNameResponse =userClient.getUserName();
 				} catch (HttpClientErrorException | HttpServerErrorException e){
 					log.error("User Service Error: {}", e.getResponseBodyAsString());
 					throw new GeneralException(ErrorStatus.USER_NOT_FOUND);

@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import app.domain.store.client.UserClient;
-import app.domain.menu.StoreMenuService;
+import app.domain.menu.service.StoreMenuService;
 import app.domain.menu.model.dto.request.MenuCreateRequest;
 import app.domain.menu.model.dto.request.MenuDeleteRequest;
 import app.domain.menu.model.dto.request.MenuUpdateRequest;

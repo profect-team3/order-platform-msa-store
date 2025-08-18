@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.domain.store.service.ManagerService;
 import app.domain.store.model.dto.response.GetStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.status.ManagerSuccessStatus;

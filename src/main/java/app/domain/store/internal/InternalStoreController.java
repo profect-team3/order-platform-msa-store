@@ -1,12 +1,14 @@
 package app.domain.store.internal;
 
 import java.util.UUID;
+
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import app.commonSecurity.TokenPrincipalParser;
 import app.domain.store.status.StoreSuccessStatus;
 import app.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class InternalStoreController {
 
 	private final InternalStoreService internalStoreService;
+	private final TokenPrincipalParser tokenPrincipalParser;
 
 	@GetMapping("/{storeId}/exists")
 	@Operation(
@@ -33,11 +36,11 @@ public class InternalStoreController {
 	@Operation(
 		summary = "가게와 사용자 일치 확인",
 		description = "storeId와 userId를 받아서 일치 여부 확인")
-	@GetMapping("/{storeId}/owner/{userId}")
+	@GetMapping("/{storeId}/owner")
 	public ApiResponse<Boolean> isStoreOwner(
-		@PathVariable UUID storeId,
-		@PathVariable Long userId) {
-		Boolean result=internalStoreService.isStoreOwner(storeId, userId);
+		@PathVariable UUID storeId, Authentication authentication) {
+		Boolean result=internalStoreService.isStoreOwner(storeId,
+			Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreSuccessStatus.STORE_OWNER_SUCCESS,result);
 	}
 

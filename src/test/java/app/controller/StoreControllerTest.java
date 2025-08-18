@@ -16,8 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import app.domain.store.StoreController;
-import app.domain.store.StoreService;
+import app.domain.store.controller.StoreController;
+import app.domain.store.service.StoreService;
 import app.domain.store.model.dto.request.StoreApproveRequest;
 import app.domain.store.model.dto.response.StoreApproveResponse;
 import app.domain.store.model.entity.Region;

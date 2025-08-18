@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.controller;
 
 import java.util.UUID;
 
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import app.commonSecurity.TokenPrincipalParser;
+import app.domain.menu.service.StoreMenuService;
 import app.domain.menu.model.dto.request.MenuCreateRequest;
 import app.domain.menu.model.dto.request.MenuDeleteRequest;
 import app.domain.menu.model.dto.request.MenuListRequest;
@@ -56,14 +56,14 @@ public class StoreMenuController {
 
 	@DeleteMapping("/menu/delete")
 	public ApiResponse<MenuDeleteResponse> deleteMenu(@Valid @RequestBody MenuDeleteRequest request, Authentication authentication) {
-		MenuDeleteResponse response = storeMenuService.deleteMenu(request, 	Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
+		MenuDeleteResponse response = storeMenuService.deleteMenu(request,Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_DELETED_SUCCESS, response);
 	}
 
-	@PutMapping("/menu/{menuId}/visible")
-	public ApiResponse<MenuUpdateResponse> updateMenuVisibility(@PathVariable UUID menuId,
+	@PutMapping("/menu/visible")
+	public ApiResponse<MenuUpdateResponse> updateMenuVisibility(
 		@Valid @RequestBody MenuVisibleRequest request, Authentication authentication) {
-		MenuUpdateResponse response = storeMenuService.updateMenuVisibility(menuId,
+		MenuUpdateResponse response = storeMenuService.updateMenuVisibility(request.getMenuId(),
 			request.getVisible(), 	Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.MENU_UPDATED_SUCCESS, response);
 	}
@@ -76,8 +76,8 @@ public class StoreMenuController {
 	}
 
 	@PutMapping("/menu/stock")
-	public ApiResponse<MenuUpdateResponse> updateStock(@Valid @RequestBody StockRequest request, @RequestHeader("UserID") Long userId) {
-		MenuUpdateResponse response = storeMenuService.updateStock(request, userId);
+	public ApiResponse<MenuUpdateResponse> updateStock(@Valid @RequestBody StockRequest request, Authentication authentication) {
+		MenuUpdateResponse response = storeMenuService.updateStock(request, Long.parseLong(tokenPrincipalParser.getUserId(authentication)));
 		return ApiResponse.onSuccess(StoreMenuSuccessStatus.STOCK_UPDATED_SUCCESS, response);
 	}
 

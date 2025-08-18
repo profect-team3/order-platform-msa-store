@@ -41,6 +41,8 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
-
+discord:
+  webhook:
+    url: ${DISCORD_URL}
 server:
   port: 8082

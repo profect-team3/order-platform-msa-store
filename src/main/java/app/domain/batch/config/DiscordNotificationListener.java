@@ -1,7 +1,9 @@
 package app.domain.batch.config;
 
+import org.bson.internal.BsonUtil;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,7 +13,10 @@ import java.util.Map;
 @Component
 public class DiscordNotificationListener implements JobExecutionListener {
 
-    private static final String DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1405941988448141494/kpZ-7N9yLddWGkuHvvOrGlRB4lb3_rrivAa7PIFN6pi_Ni9eQ3jn2hvfYwihcgozUUiW";
+    // private static final String DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1406861320732540938/105lGe9ox-M6r7kD0LXV4cs7QibndOGJdPV-9YIoWQ8-73sFHJtNXaFxYlor5lUTRw5k";
+    @Value("${discord.webhook.url}")
+    private String discordWebhookUrl;
+
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
@@ -39,7 +44,7 @@ public class DiscordNotificationListener implements JobExecutionListener {
 
         try {
             RestTemplate restTemplate = new RestTemplate();
-            restTemplate.postForEntity(DISCORD_WEBHOOK_URL, payload, String.class);
+            restTemplate.postForEntity(discordWebhookUrl, payload, String.class);
             System.out.println("Discord 알림 전송 성공: " + message);
         } catch (Exception e) {
             System.err.println("Discord 알림 전송 실패: " + e.getMessage());

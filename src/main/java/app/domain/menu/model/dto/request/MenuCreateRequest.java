@@ -18,6 +18,4 @@ public class MenuCreateRequest {
 	@NotNull
 	private Long price;
 	private String description;
-	@NotNull
-	private UUID categoryId;
 }

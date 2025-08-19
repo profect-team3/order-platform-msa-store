@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.service;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,12 +11,15 @@ import app.domain.menu.model.dto.request.MenuCreateRequest;
 import app.domain.menu.model.dto.request.MenuDeleteRequest;
 import app.domain.menu.model.dto.request.MenuListRequest;
 import app.domain.menu.model.dto.request.MenuUpdateRequest;
+import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.dto.response.MenuCreateResponse;
 import app.domain.menu.model.dto.response.MenuDeleteResponse;
 import app.domain.menu.model.dto.response.MenuListResponse;
 import app.domain.menu.model.dto.response.MenuUpdateResponse;
 import app.domain.menu.model.entity.Menu;
+import app.domain.menu.model.entity.Stock;
 import app.domain.menu.model.repository.MenuRepository;
+import app.domain.menu.model.repository.StockRepository;
 import app.domain.menu.status.StoreMenuErrorCode;
 import app.domain.store.model.entity.Store;
 import app.domain.store.repository.StoreRepository;

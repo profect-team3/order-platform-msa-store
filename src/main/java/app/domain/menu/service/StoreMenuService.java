@@ -54,7 +54,7 @@ public class StoreMenuService {
 			throw new GeneralException(StoreMenuErrorCode.MENU_NAME_DUPLICATE);
 		}
 
-		Menu menu = new Menu(null, store, request.getName(), request.getPrice(), request.getDescription(), false, category, null);
+		Menu menu = new Menu(null, store, request.getName(), request.getPrice(), request.getDescription(), false,null);
 
 		Menu savedMenu = menuRepository.save(menu);
 

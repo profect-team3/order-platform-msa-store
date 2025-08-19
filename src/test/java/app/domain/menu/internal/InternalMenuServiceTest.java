@@ -38,6 +38,8 @@ class InternalMenuServiceTest {
 
     @Autowired
     private InternalMenuService internalMenuService;
+    @Autowired
+    private StockRetryService stockRetryService;
 
     @Autowired
     private MenuRepository menuRepository;
@@ -108,7 +110,7 @@ class InternalMenuServiceTest {
             executorService.submit(() -> {
                 try {
                     StockRequest request = new StockRequest(savedMenu.getMenuId(), 1L);
-                    internalMenuService.decreaseStock(Collections.singletonList(request));
+                    stockRetryService.decreaseStock(Collections.singletonList(request));
                 } catch (GeneralException e) {
                     System.out.println("재고 감소 최종 실패(예상된 결과일 수 있음)" + e.getMessage());
                 } finally {

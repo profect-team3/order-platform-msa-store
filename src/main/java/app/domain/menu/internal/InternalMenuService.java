@@ -12,10 +12,6 @@ import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,13 +45,9 @@ public class InternalMenuService {
 		return menus.stream().map(MenuInfoResponse::from).toList();
 	}
 
-	@Retryable(
-		value = {ObjectOptimisticLockingFailureException.class},
-		maxAttempts = 5,
-		backoff = @Backoff(delay = 300, multiplier = 2)
-	)
+
 	@Transactional
-	public boolean decreaseStock(List<StockRequest> requests) {
+	public boolean decreaseStockTransactional(List<StockRequest> requests) {
 		List<UUID> menuIds = requests.stream()
 				.map(StockRequest::getMenuId)
 				.toList();
@@ -80,9 +72,4 @@ public class InternalMenuService {
 		}
 	}
 
-	@Recover
-	public boolean recover(ObjectOptimisticLockingFailureException e, List<StockRequest> requests) {
-		log.error("재고 감소 재시도 모두 실패. 요청: {}", requests, e);
-		throw new GeneralException(StoreMenuErrorCode.CONCURRENCY_ERROR);
-	}
 }

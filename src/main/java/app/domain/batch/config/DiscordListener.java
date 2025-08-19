@@ -1,6 +1,5 @@
 package app.domain.batch.config;
 
-import org.bson.internal.BsonUtil;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,9 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class DiscordNotificationListener implements JobExecutionListener {
+public class DiscordListener implements JobExecutionListener {
 
-    // private static final String DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1406861320732540938/105lGe9ox-M6r7kD0LXV4cs7QibndOGJdPV-9YIoWQ8-73sFHJtNXaFxYlor5lUTRw5k";
     @Value("${discord.webhook.url}")
     private String discordWebhookUrl;
 

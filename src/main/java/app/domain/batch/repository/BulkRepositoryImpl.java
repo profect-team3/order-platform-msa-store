@@ -1,7 +1,7 @@
 package app.domain.batch.repository;
 
-import app.domain.batch.dto.StoreMenuDto;
-import com.querydsl.core.types.Projections;
+import app.domain.batch.dto.BulkDto;
+
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -24,17 +24,19 @@ import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-public class BatchStoreRepositoryImpl implements BatchStoreRepository {
+public class BulkRepositoryImpl implements BulkRepository {
 
     private final EntityManager entityManager;
     private final ObjectMapper objectMapper;
 
     @Override
-    public List<StoreMenuDto> findStoresWithDetailsCursor(UUID lastStoreId, int limit) {
+    public List<BulkDto> findStoresWithDetailsCursor(UUID lastStoreId, int limit) {
         QStore s = QStore.store;
         QRegion region = QRegion.region;
         QCategory category = QCategory.category;
         QReview review = QReview.review;
+        QCategory parentCategory = new QCategory("parentCategory");
+        QCategory grandparentCategory = new QCategory("grandparentCategory");
 
         com.querydsl.core.types.Expression<Double> avgRatingExpr = JPAExpressions.select(review.rating.avg().coalesce(0.0))
                 .from(review)
@@ -60,19 +62,23 @@ public class BatchStoreRepositoryImpl implements BatchStoreRepository {
                         region.regionName,
                         region.fullName,
                         category.categoryName,
+                        parentCategory.categoryName,
+                        grandparentCategory.categoryName,
                         avgRatingExpr,
                         reviewCountExpr
                 )
                 .from(s)
                 .join(s.region, region)
                 .join(s.category, category)
+                .leftJoin(category.parentCategory, parentCategory)
+                .leftJoin(parentCategory.parentCategory, grandparentCategory)
                 .where(lastStoreId == null ? Expressions.TRUE : s.storeId.gt(lastStoreId))
                 .orderBy(s.storeId.asc())
                 .limit(limit)
                 .fetch();
 
-        List<StoreMenuDto> stores = tuples.stream().map(tuple -> {
-            StoreMenuDto dto = new StoreMenuDto();
+        List<BulkDto> stores = tuples.stream().map(tuple -> {
+            BulkDto dto = new BulkDto();
             dto.setStoreId(tuple.get(s.storeId));
             dto.setUserId(tuple.get(s.userId));
             dto.setStoreName(tuple.get(s.storeName));
@@ -88,7 +94,16 @@ public class BatchStoreRepositoryImpl implements BatchStoreRepository {
             }
             dto.setRegionName(tuple.get(region.regionName));
             dto.setRegionFullName(tuple.get(region.fullName));
-            dto.setCategoryName(tuple.get(category.categoryName));
+            String categoryName = tuple.get(category.categoryName);
+            String parentCategoryName = tuple.get(parentCategory.categoryName);
+            String grandparentCategoryName = tuple.get(grandparentCategory.categoryName);
+
+            List<String> categoryKeys = new java.util.ArrayList<>();
+            if (grandparentCategoryName != null) categoryKeys.add(grandparentCategoryName);
+            if (parentCategoryName != null) categoryKeys.add(parentCategoryName);
+            categoryKeys.add(categoryName);
+            dto.setCategoryKeys(categoryKeys);
+
             dto.setAvgRating(tuple.get(avgRatingExpr));
             dto.setReviewCount(tuple.get(reviewCountExpr));
             return dto;
@@ -98,7 +113,7 @@ public class BatchStoreRepositoryImpl implements BatchStoreRepository {
             return List.of();
         }
 
-        List<UUID> storeIds = stores.stream().map(StoreMenuDto::getStoreId).toList();
+        List<UUID> storeIds = stores.stream().map(BulkDto::getStoreId).toList();
         QMenu menu = QMenu.menu;
         List<Menu> menus = new JPAQuery<>(entityManager)
                 .select(menu)

@@ -53,10 +53,6 @@ public class Menu extends BaseEntity {
 	@Column(name = "is_hidden", nullable = false)
 	private boolean hidden = false;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id", nullable = true)
-	private Category category;
-
 	public void update(String name, Long price, String description, Boolean isHidden) {
 		if (name != null) {
 			this.name = name;

@@ -20,6 +20,18 @@ public class StoreCollectionQueryController {
 
     private final StoreCollectionQueryService storeCollectionQueryService;
 
+    @GetMapping("/search")
+    @Operation(summary = "통합 검색 API", description = "가게 이름, 카테고리, 메뉴 이름에서 키워드로 가게를 검색합니다. (대소문자 무관)")
+    @Parameter(name = "keyword", description = "검색할 키워드", required = true)
+    public ApiResponse<List<StoreCollection>> searchStores(@RequestParam("keyword") String keyword) {
+        List<StoreCollection> stores = storeCollectionQueryService.searchStores(keyword);
+        if (stores.isEmpty()) {
+            return ApiResponse.onFailure(MongoStoreMenuErrorCode.STORE_NOT_FOUND, null);
+        } else {
+            return ApiResponse.onSuccess(MongoStoreMenuSuccessCode.STORE_GET_SUCCESS, stores);
+        }
+    }
+
     @GetMapping
     @Operation(summary = "전체 가게 목록 조회 API", description = "DB에 저장된 전체 가게 목록을 조회합니다.")
     public ApiResponse<List<StoreCollection>> getAllStores() {
@@ -53,10 +65,10 @@ public class StoreCollectionQueryController {
     }
 
     @GetMapping("/search-by-category")
-    @Operation(summary = "카테고리로 가게 검색 API", description = "카테고리 이름에 키워드가 포함된 가게 목록을 조회합니다. (대소문자 무관)")
+    @Operation(summary = "카테고리로 가게 검색 API", description = "제공된 카테고리 키워드를 포함하는 가게 목록을 조회합니다. (대소문자 무관)")
     @Parameter(name = "category", description = "검색할 카테고리 키워드", required = true)
-    public ApiResponse<List<StoreCollection>> searchStoresByPrimaryCategory(@RequestParam("category") String category) {
-        List<StoreCollection> stores = storeCollectionQueryService.searchStoresByPrimaryCategory(category);
+    public ApiResponse<List<StoreCollection>> searchStoresByCategory(@RequestParam("category") String category) {
+        List<StoreCollection> stores = storeCollectionQueryService.searchStoresByCategory(category);
         if (stores.isEmpty()) {
             return ApiResponse.onFailure(MongoStoreMenuErrorCode.STORE_NOT_FOUND, null);
         } else {

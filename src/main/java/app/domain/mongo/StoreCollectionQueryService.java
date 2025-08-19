@@ -20,15 +20,26 @@ public class StoreCollectionQueryService {
 
     private final MongoTemplate mongoTemplate;
 
+    public List<StoreCollection> searchStores(String keyword) {
+        Query query = new Query();
+        Criteria criteria = new Criteria().orOperator(
+                Criteria.where("storeName").regex(keyword, "i"),
+                Criteria.where("categoryKeys").regex(keyword, "i"),
+                Criteria.where("menus.name").regex(keyword, "i")
+        );
+        query.addCriteria(criteria);
+        return mongoTemplate.find(query, StoreCollection.class);
+    }
+
     public List<StoreCollection> searchStoresByName(String storeNameKeyword) {
         Query query = new Query();
         query.addCriteria(Criteria.where("storeName").regex(storeNameKeyword, "i"));
         return mongoTemplate.find(query, StoreCollection.class);
     }
 
-    public List<StoreCollection> searchStoresByPrimaryCategory(String category) {
+    public List<StoreCollection> searchStoresByCategory(String category) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("primaryCategory").regex(category, "i"));
+        query.addCriteria(Criteria.where("categoryKeys").regex(category, "i"));
         return mongoTemplate.find(query, StoreCollection.class);
     }
 

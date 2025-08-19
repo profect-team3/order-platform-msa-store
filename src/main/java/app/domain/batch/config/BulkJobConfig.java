@@ -10,40 +10,40 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import app.domain.batch.dto.StoreMenuDto;
-import app.domain.batch.job.StoreBatchReader;
-import app.domain.batch.job.StoreBatchProcessor;
-import app.domain.batch.job.StoreBatchWriter;
+import app.domain.batch.dto.BulkDto;
+import app.domain.batch.job.BulkReader;
+import app.domain.batch.job.BulkProcessor;
+import app.domain.batch.job.BulkWriter;
 import app.domain.mongo.model.entity.StoreCollection;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class StoreBatchJobConfig {
+public class BulkJobConfig {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
-	private final StoreBatchReader storeBatchReader;
-	private final StoreBatchProcessor storeBatchProcessor;
-	private final StoreBatchWriter storeBatchWriter;
-	private final DiscordNotificationListener discordNotificationListener;
+	private final BulkReader bulkReader;
+	private final BulkProcessor bulkProcessor;
+	private final BulkWriter bulkWriter;
+	private final DiscordListener discordListener;
 
 	@Bean
 	public Job storeBatchJob() {
 		return new JobBuilder("storeBatchJob", jobRepository)
 			.start(storeBatchStep())
-			.listener(discordNotificationListener)
+			.listener(discordListener)
 			.build();
 	}
 
 	@Bean
 	public Step storeBatchStep() {
 		return new StepBuilder("storeBatchStep", jobRepository)
-			.<StoreMenuDto, StoreCollection>chunk(100, transactionManager)
-			.reader(storeBatchReader)
-			.processor(storeBatchProcessor)
-			.writer(storeBatchWriter)
+			.<BulkDto, StoreCollection>chunk(100, transactionManager)
+			.reader(bulkReader)
+			.processor(bulkProcessor)
+			.writer(bulkWriter)
 			.build();
 	}
 

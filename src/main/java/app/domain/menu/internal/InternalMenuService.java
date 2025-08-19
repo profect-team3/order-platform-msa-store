@@ -10,6 +10,8 @@ import app.domain.menu.model.repository.StockRepository;
 import app.domain.menu.status.StoreMenuErrorCode;
 import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InternalMenuService {
@@ -42,8 +45,9 @@ public class InternalMenuService {
 		return menus.stream().map(MenuInfoResponse::from).toList();
 	}
 
+
 	@Transactional
-	public boolean decreaseStock(List<StockRequest> requests) {
+	public boolean decreaseStockTransactional(List<StockRequest> requests) {
 		List<UUID> menuIds = requests.stream()
 				.map(StockRequest::getMenuId)
 				.toList();
@@ -67,4 +71,5 @@ public class InternalMenuService {
 			throw new GeneralException(StoreMenuErrorCode.OUT_OF_STOCK);
 		}
 	}
+
 }

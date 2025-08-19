@@ -21,7 +21,9 @@ public enum StoreMenuErrorCode implements BaseCode {
 	MENU_ID_NULL(HttpStatus.BAD_REQUEST, "MENU008", "메뉴 ID는 null일 수 없습니다."),
 	OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "MENU09", "재고가 부족합니다."),
 	USER_NOT_FOUND_FOR_MENU(HttpStatus.NOT_FOUND, "MENU0010", "메뉴 관련 작업을 수행할 사용자를 찾을 수 없습니다."),
-	MENU_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "MENU011", "메뉴 카테고리를 찾을 수 없습니다.");
+	MENU_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "MENU011", "메뉴 카테고리를 찾을 수 없습니다."),
+	CONCURRENCY_ERROR(HttpStatus.CONFLICT, "MENU012", "데이터 처리 중 충돌이 발생했습니다. 다시 시도해 주세요."),
+	NOT_STORE_OWNER(HttpStatus.BAD_REQUEST,"Menu013","가게 점주만 재고를 수정할 수 있습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

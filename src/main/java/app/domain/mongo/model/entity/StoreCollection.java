@@ -23,7 +23,6 @@ public class StoreCollection {
 	private String storeName;
 	private String description;
 	private List<String> categoryKeys;
-	private String primaryCategory;
 	private Double avgRating;
 	private Long reviewCount;
 	private String phoneNumber;

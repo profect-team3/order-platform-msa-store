@@ -1,4 +1,4 @@
-package app.domain.menu;
+package app.domain.menu.service;
 
 import java.util.UUID;
 

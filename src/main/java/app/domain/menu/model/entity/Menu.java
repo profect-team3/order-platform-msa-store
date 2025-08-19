@@ -68,6 +68,13 @@ public class Menu extends BaseEntity {
 		}
 	}
 
+	public void updateVisible(Boolean isHidden) {
+		if (isHidden != null) {
+			this.hidden = isHidden;
+		}
+	}
+
+
 	private LocalDateTime deletedAt;
 
 	public void markAsDeleted() {

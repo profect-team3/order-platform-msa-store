@@ -30,6 +30,7 @@ public class StoreMenuService {
 
 	private final MenuRepository menuRepository;
 	private final StoreRepository storeRepository;
+	private final StockRepository stockRepository;
 
 	@Transactional
 	public MenuCreateResponse createMenu(MenuCreateRequest request, Long userId) {
@@ -81,7 +82,7 @@ public class StoreMenuService {
 			.orElseThrow(() -> new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND));
 
 		if (!menu.getStore().getUserId().equals(userId)) {
-			throw new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND);
+			throw new GeneralException(StoreMenuErrorCode.USER_NOT_FOUND_FOR_MENU);
 		}
 
 		if (menu.getDeletedAt() != null) {
@@ -104,7 +105,7 @@ public class StoreMenuService {
 			throw new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND);
 		}
 
-		menu.update(null, null, null, visible);
+		menu.updateVisible(visible);
 		Menu updatedMenu = menuRepository.save(menu);
 
 		return new MenuUpdateResponse(updatedMenu.getMenuId(), updatedMenu.getName());
@@ -123,5 +124,23 @@ public class StoreMenuService {
 			.collect(Collectors.toList());
 
 		return new MenuListResponse(store.getStoreId(), menuDetails);
+	}
+
+	@Transactional
+	public MenuUpdateResponse updateStock(StockRequest request, Long userId) {
+		Menu menu = menuRepository.findByMenuIdAndDeletedAtIsNull(request.getMenuId())
+			.orElseThrow(() -> new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND));
+
+		if (!menu.getStore().getUserId().equals(userId)) {
+			throw new GeneralException(StoreMenuErrorCode.MENU_NOT_FOUND);
+		}
+
+		Stock stock = stockRepository.findByMenu_MenuId(request.getMenuId())
+			.orElse(Stock.builder().menu(menu).stock(0L).build());
+
+		stock.setStock(request.getQuantity());
+		stockRepository.save(stock);
+
+		return new MenuUpdateResponse(menu.getMenuId(), menu.getName());
 	}
 }

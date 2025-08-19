@@ -15,13 +15,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import app.client.OrderClient;
-import app.client.ReviewClient;
-import app.client.UserClient;
+
 import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.repository.CategoryRepository;
 import app.domain.menu.model.repository.MenuRepository;
-import app.domain.store.StoreService;
+import app.domain.store.service.StoreService;
+import app.domain.store.client.OrderClient;
+import app.domain.store.client.ReviewClient;
+import app.domain.store.client.UserClient;
 import app.domain.store.model.dto.request.StoreApproveRequest;
 import app.domain.store.model.dto.response.StoreApproveResponse;
 import app.domain.store.model.entity.Region;
@@ -85,18 +86,18 @@ class StoreServiceTest {
     @Test
     @DisplayName("가게 생성 성공")
     void createStore_Success() {
-        when(userClient.isUserExists(testUserId)).thenReturn(true);
+        when(userClient.isUserExists()).thenReturn(true);
         when(regionRepository.findById(testRegionId)).thenReturn(Optional.of(mockRegion));
         when(categoryRepository.findById(testCategoryId)).thenReturn(Optional.of(mockCategory));
         when(storeRepository.save(any(Store.class))).thenReturn(mockStore);
 
-        StoreApproveResponse response = storeService.createStore(storeApproveRequest, testUserId);
+        StoreApproveResponse response = storeService.createStore(storeApproveRequest);
 
         assertNotNull(response);
         assertEquals(mockStore.getStoreId(), response.getStoreId());
         assertEquals(StoreAcceptStatus.PENDING.name(), response.getStoreApprovalStatus());
 
-        verify(userClient).isUserExists(testUserId);
+        verify(userClient).isUserExists();
         verify(regionRepository).findById(testRegionId);
         verify(categoryRepository).findById(testCategoryId);
         verify(storeRepository).save(any(Store.class));

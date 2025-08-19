@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.service;
 
 import java.util.List;
 import java.util.UUID;
@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import app.domain.store.client.OrderClient;
 import app.domain.store.client.ReviewClient;
@@ -33,9 +35,11 @@ import app.global.apiPayload.ApiResponse;
 import app.global.apiPayload.code.status.ErrorStatus;
 import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StoreService {
 
 	private final StoreRepository storeRepository;
@@ -49,14 +53,17 @@ public class StoreService {
 	@Transactional
 	public StoreApproveResponse createStore(StoreApproveRequest request, Long userId) {
 
-		ApiResponse<Boolean> isUserExistsResponse = userClient.isUserExists(userId);
+		try {
+			ApiResponse<Boolean> isUserExistsResponse = userClient.isUserExists();
 
-		Boolean isUserExists=isUserExistsResponse.result();
-		if(!isUserExistsResponse.isSuccess()){
+			Boolean isUserExists=isUserExistsResponse.result();
+
+			if (!isUserExists) {
+				throw new GeneralException(StoreErrorCode.USER_NOT_FOUND);
+			}
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("User Service Error: {}",e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
-		}
-		if (!isUserExists) {
-			throw new GeneralException(StoreErrorCode.USER_NOT_FOUND);
 		}
 
 		Region region = regionRepository.findById(request.getRegionId())
@@ -151,12 +158,14 @@ public class StoreService {
 			throw new GeneralException(StoreErrorCode.INVALID_USER_ROLE);
 		}
 
-		ApiResponse<List<GetReviewResponse>> getReviewResponse = reviewClient.getReviewsByStoreId(storeId);
-		if(!getReviewResponse.isSuccess()){
+		try {
+			ApiResponse<List<GetReviewResponse>> getReviewResponse = reviewClient.getReviewsByStoreId(storeId);
+			return getReviewResponse.result();
+		} catch (HttpServerErrorException | HttpClientErrorException e){
+			log.error("Review Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
 		}
 
-		return getReviewResponse.result();
 	}
 
 	@Transactional(readOnly = true)
@@ -168,17 +177,22 @@ public class StoreService {
 		if (!store.getUserId().equals(userId)) {
 			throw new GeneralException(StoreErrorCode.INVALID_USER_ROLE);
 		}
-
-		ApiResponse<List<StoreOrderInfo>> storeOrderInfoResponse = orderClient.getOrdersByStoreId(storeId);
-		if(!storeOrderInfoResponse.isSuccess()){
-			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		ApiResponse<List<StoreOrderInfo>> storeOrderInfoResponse;
+		try{
+			storeOrderInfoResponse= orderClient.getOrdersByStoreId(storeId);
+		} catch (HttpServerErrorException | HttpClientErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
+			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
 		}
 
 		List<StoreOrderInfo> orders= storeOrderInfoResponse.result();
 		List<StoreOrderListResponse.StoreOrderDetail> orderDetails = orders.stream()
 			.map(orderInfo -> {
-				ApiResponse<String> getUserNameResponse =userClient.getUserName(orderInfo.getCustomerId());
-				if(!getUserNameResponse.isSuccess()){
+				ApiResponse<String> getUserNameResponse;
+				try{
+					getUserNameResponse =userClient.getUserName();
+				} catch (HttpClientErrorException | HttpServerErrorException e){
+					log.error("User Service Error: {}", e.getResponseBodyAsString());
 					throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
 				}
 
@@ -199,9 +213,11 @@ public class StoreService {
 
 	@Transactional
 	public void acceptOrder(UUID orderId, Long userId) {
-
-		ApiResponse<OrderInfo> orderInfoResponse = orderClient.getOrderInfo(orderId);
-		if(!orderInfoResponse.isSuccess()){
+		ApiResponse<OrderInfo> orderInfoResponse;
+		try {
+			orderInfoResponse = orderClient.getOrderInfo(orderId);
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
 		}
 		OrderInfo orderInfo=orderInfoResponse.result();
@@ -212,19 +228,22 @@ public class StoreService {
 		if (!store.getUserId().equals(userId)) {
 			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
 		}
-
-		ApiResponse<String> updateOrderStatusResponse =orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
-		if(!updateOrderStatusResponse.isSuccess()){
+		ApiResponse<String> updateOrderStatusResponse;
+		try{
+			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, "ACCEPTED");
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@Transactional
 	public void rejectOrder(UUID orderId, Long userId) {
-
-		ApiResponse<OrderInfo> orderInfoResponse = orderClient.getOrderInfo(orderId);
-		if(!orderInfoResponse.isSuccess()){
+		ApiResponse<OrderInfo> orderInfoResponse;
+		try {
+			orderInfoResponse = orderClient.getOrderInfo(orderId);
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus.ORDER_NOT_FOUND);
 		}
 		OrderInfo orderInfo=orderInfoResponse.result();
@@ -235,9 +254,11 @@ public class StoreService {
 		if (!store.getUserId().equals(userId)) {
 			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
 		}
-
-		ApiResponse<String> updateOrderStatusResponse =orderClient.updateOrderStatus(orderId, orderInfo.getOrderStatus());
-		if(!updateOrderStatusResponse.isSuccess()){
+		ApiResponse<String> updateOrderStatusResponse;
+		try{
+			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, "REJECTED");
+		} catch (HttpClientErrorException|HttpServerErrorException e){
+			log.error("Order Service Error: {}", e.getResponseBodyAsString());
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
 		}
 	}

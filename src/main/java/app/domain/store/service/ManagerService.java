@@ -1,4 +1,4 @@
-package app.domain.store;
+package app.domain.store.service;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +49,7 @@ public class ManagerService {
 		}
 
 		Double avgRating = getStoreListResponse.result().get(0).getAverage();
-		ApiResponse<GetUserInfoResponse> getUserInfoResponse = userClient.getUserInfo(store.getUserId());
+		ApiResponse<GetUserInfoResponse> getUserInfoResponse = userClient.getUserInfo();
 		if(!getStoreListResponse.isSuccess()){
 			throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
 		}

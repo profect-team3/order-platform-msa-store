@@ -48,8 +48,8 @@ public class StoreCollectionQueryController {
     @Parameter(name = "storeId", description = "조회할 가게의 ID", required = true)
     public ApiResponse<StoreCollection> getStoreById(@PathVariable String storeId) {
         return storeCollectionQueryService.findStoreById(storeId)
-                .map(store -> ApiResponse.onSuccess(MongoStoreMenuSuccessCode.STORE_GET_SUCCESS, store))
-                .orElse(ApiResponse.onFailure(MongoStoreMenuErrorCode.STORE_NOT_FOUND, null));
+                .map(store -> ApiResponse.onSuccess(MongoStoreMenuSuccessCode.MENU_GET_SUCCESS, store))
+                .orElse(ApiResponse.onFailure(MongoStoreMenuErrorCode.MENU_NOT_FOUND, null));
     }
 
     @GetMapping("/search-by-name")

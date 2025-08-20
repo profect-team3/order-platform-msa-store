@@ -22,13 +22,27 @@ public class StoreCollectionQueryService {
 
     public List<StoreCollection> searchStores(String keyword) {
         Query query = new Query();
-        Criteria criteria = new Criteria().orOperator(
+        Criteria searchCriteria = new Criteria().orOperator(
                 Criteria.where("storeName").regex(keyword, "i"),
                 Criteria.where("categoryKeys").regex(keyword, "i"),
                 Criteria.where("menus.name").regex(keyword, "i")
         );
-        query.addCriteria(criteria);
+        Criteria activeCriteria = Criteria.where("isActive").is(true);
+        Criteria combinedCriteria = new Criteria().andOperator(searchCriteria, activeCriteria);
+        query.addCriteria(combinedCriteria);
         return mongoTemplate.find(query, StoreCollection.class);
+    }
+
+    public Optional<StoreCollection> findStoreById(String storeId) {
+        StoreCollection store = mongoTemplate.findById(storeId, StoreCollection.class);
+
+        if (store != null && store.getMenus() != null) {
+            store.setMenus(store.getMenus().stream()
+                .filter(menu -> !menu.isHidden())
+                .collect(java.util.stream.Collectors.toList()));
+        }
+
+        return Optional.ofNullable(store);
     }
 
     public List<StoreCollection> searchStoresByName(String storeNameKeyword) {
@@ -72,9 +86,5 @@ public class StoreCollectionQueryService {
 
     public List<StoreCollection> findAllStores() {
         return mongoTemplate.findAll(StoreCollection.class);
-    }
-
-    public Optional<StoreCollection> findStoreById(String storeId) {
-        return Optional.ofNullable(mongoTemplate.findById(storeId, StoreCollection.class));
     }
 }

@@ -24,7 +24,7 @@ public class BulkProcessor implements ItemProcessor<BulkDto, StoreCollection> {
 	public StoreCollection process(BulkDto dto) throws Exception {
 		StoreCollection storeCollection = new StoreCollection();
 
-		storeCollection.setId(dto.getStoreId().toString());
+		storeCollection.setStoreId(dto.getStoreId().toString());
 		storeCollection.setUserId(dto.getUserId());
 		storeCollection.setStoreName(dto.getStoreName());
 		storeCollection.setDescription(dto.getDescription());

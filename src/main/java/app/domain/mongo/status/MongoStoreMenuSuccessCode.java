@@ -12,9 +12,7 @@ import lombok.Getter;
 public enum MongoStoreMenuSuccessCode implements BaseCode {
 
 	MENU_GET_SUCCESS(HttpStatus.OK, "MONGO200", "메뉴 조회 성공"),
-	STORE_GET_SUCCESS(HttpStatus.OK, "MONGO200", "가게 조회 성공"),
-	MENU_ADD_SUCCESS(HttpStatus.CREATED,"MONGO201", "메뉴 추가 성공" ),
-	STORE_CREATE_SUCCESS(HttpStatus.CREATED,"MONGO201", "가게 추가 성공");
+	STORE_GET_SUCCESS(HttpStatus.OK, "MONGO200", "가게 조회 성공");
 
 	private final HttpStatus httpStatus;
 	private final String code;

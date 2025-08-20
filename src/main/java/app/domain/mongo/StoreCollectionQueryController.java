@@ -21,7 +21,7 @@ public class StoreCollectionQueryController {
     private final StoreCollectionQueryService storeCollectionQueryService;
 
     @GetMapping("/search")
-    @Operation(summary = "통합 검색 API", description = "가게 이름, 카테고리, 메뉴 이름에서 키워드로 가게를 검색합니다. (대소문자 무관)")
+    @Operation(summary = "통합 검색 API", description = "가게 이름, 카테고리, 메뉴 이름에서 키워드로 활성 상태인 가게를 검색합니다 ")
     @Parameter(name = "keyword", description = "검색할 키워드", required = true)
     public ApiResponse<List<StoreCollection>> searchStores(@RequestParam("keyword") String keyword) {
         List<StoreCollection> stores = storeCollectionQueryService.searchStores(keyword);
@@ -30,6 +30,15 @@ public class StoreCollectionQueryController {
         } else {
             return ApiResponse.onSuccess(MongoStoreMenuSuccessCode.STORE_GET_SUCCESS, stores);
         }
+    }
+
+    @GetMapping("/{storeId}")
+    @Operation(summary = "메뉴 포함 상세 조회 API", description = "가게 ID를 사용하여 모든 메뉴(보임 처리)를 불러옵니다.")
+    @Parameter(name = "storeId", description = "조회할 가게의 ID", required = true)
+    public ApiResponse<StoreCollection> getStoreById(@PathVariable String storeId) {
+        return storeCollectionQueryService.findStoreById(storeId)
+            .map(store -> ApiResponse.onSuccess(MongoStoreMenuSuccessCode.MENU_GET_SUCCESS, store))
+            .orElse(ApiResponse.onFailure(MongoStoreMenuErrorCode.MENU_NOT_FOUND, null));
     }
 
     @GetMapping
@@ -41,15 +50,6 @@ public class StoreCollectionQueryController {
         } else {
             return ApiResponse.onSuccess(MongoStoreMenuSuccessCode.STORE_GET_SUCCESS, stores);
         }
-    }
-
-    @GetMapping("/{storeId}")
-    @Operation(summary = "특정 가게 상세 정보 조회 API", description = "가게 ID를 사용하여 특정 가게의 모든 정보를 조회합니다.")
-    @Parameter(name = "storeId", description = "조회할 가게의 ID", required = true)
-    public ApiResponse<StoreCollection> getStoreById(@PathVariable String storeId) {
-        return storeCollectionQueryService.findStoreById(storeId)
-                .map(store -> ApiResponse.onSuccess(MongoStoreMenuSuccessCode.STORE_GET_SUCCESS, store))
-                .orElse(ApiResponse.onFailure(MongoStoreMenuErrorCode.STORE_NOT_FOUND, null));
     }
 
     @GetMapping("/search-by-name")

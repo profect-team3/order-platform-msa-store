@@ -18,7 +18,7 @@ import lombok.Setter;
 @CompoundIndex(name = "store_search_index", def = "{'categoryKeys': 1, 'regionName': 1, 'isActive': 1}")
 public class StoreCollection {
 	@Id
-	private String id;
+	private String storeId;
 	private Long userId;
 	private String storeName;
 	private String description;

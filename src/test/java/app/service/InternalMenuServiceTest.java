@@ -1,6 +1,7 @@
-package app.domain.menu.internal;
+package app.service;
 
-import app.domain.batch.config.DiscordNotificationListener;
+import app.domain.batch.config.DiscordListener;
+import app.domain.menu.internal.StockRetryService;
 import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.entity.Menu;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
@@ -34,10 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class InternalMenuServiceTest {
 
     @MockitoBean
-    private DiscordNotificationListener discordNotificationListener;
+    private DiscordListener discordListener;
 
-    @Autowired
-    private InternalMenuService internalMenuService;
     @Autowired
     private StockRetryService stockRetryService;
 
@@ -55,6 +56,9 @@ class InternalMenuServiceTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     private Menu savedMenu;
 
@@ -112,7 +116,7 @@ class InternalMenuServiceTest {
                     StockRequest request = new StockRequest(savedMenu.getMenuId(), 1L);
                     stockRetryService.decreaseStock(Collections.singletonList(request));
                 } catch (GeneralException e) {
-                    System.out.println("재고 감소 최종 실패(예상된 결과일 수 있음)" + e.getMessage());
+                    System.out.println("재고 감소 최종 실패(예상된 결과일 수 있음): " + e.getMessage());
                 } finally {
                     latch.countDown();
                 }
@@ -122,14 +126,12 @@ class InternalMenuServiceTest {
         latch.await();
         executorService.shutdown();
 
-        Stock resultStock = stockRepository.findByMenuMenuIdIn(Collections.singletonList(savedMenu.getMenuId())).get(0);
-
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        Stock resultStock = transactionTemplate.execute(status -> stockRepository.findByMenuMenuIdIn(Collections.singletonList(savedMenu.getMenuId())).get(0));
         long expectedStock = 0L;
         long actualStock = resultStock.getStock();
 
-        System.out.println("재고 검증 >> 예상 재고 : " + expectedStock +" 실재 재고: "+ actualStock);
-
-        // Note: 이 테스트는 높은 동시성으로 인해 실패할 수 있습니다.
+        System.out.println("재고 검증 >> 예상 재고: " + expectedStock + ", 실제 재고: " + actualStock);
         assertEquals(expectedStock, actualStock, "재고가 0이 되어야 합니다.");
     }
 }

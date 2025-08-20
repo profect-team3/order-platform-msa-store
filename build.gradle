@@ -55,6 +55,7 @@ dependencies {
     implementation files('libs/msa-common-security-1.0.8-plain.jar')
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // 헬스체크 등
     implementation "org.springframework.boot:spring-boot-starter-actuator"

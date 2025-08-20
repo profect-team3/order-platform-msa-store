@@ -2,6 +2,7 @@ package app.domain.store.client;
 
 import app.domain.store.model.dto.response.GetReviewResponse;
 import app.global.apiPayload.ApiResponse;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -53,6 +54,7 @@ public class ReviewClient {
 	}
 
 	@Data
+	@AllArgsConstructor
 	public static class StoreReviewResponse {
 		private UUID storeId;
 		private Long number;

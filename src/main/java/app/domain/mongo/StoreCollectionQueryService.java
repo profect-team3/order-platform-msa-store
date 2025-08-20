@@ -22,12 +22,14 @@ public class StoreCollectionQueryService {
 
     public List<StoreCollection> searchStores(String keyword) {
         Query query = new Query();
-        Criteria criteria = new Criteria().orOperator(
+        Criteria searchCriteria = new Criteria().orOperator(
                 Criteria.where("storeName").regex(keyword, "i"),
                 Criteria.where("categoryKeys").regex(keyword, "i"),
                 Criteria.where("menus.name").regex(keyword, "i")
         );
-        query.addCriteria(criteria);
+        Criteria activeCriteria = Criteria.where("isActive").is(true);
+        Criteria combinedCriteria = new Criteria().andOperator(searchCriteria, activeCriteria);
+        query.addCriteria(combinedCriteria);
         return mongoTemplate.find(query, StoreCollection.class);
     }
 

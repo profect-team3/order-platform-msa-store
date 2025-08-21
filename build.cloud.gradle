@@ -13,10 +13,6 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url 'https://repo.spring.io/snapshot' }
-}
 
 dependencyManagement {
     imports {

@@ -35,7 +35,7 @@ public class StoreCollectionQueryService {
     }
 
     public Optional<StoreCollection> findStoreByStoreKey(String storeKey) {
-        Query query = new Query(Criteria.where("storeId").is(storeKey));
+        Query query = new Query(Criteria.where("storeKey").is(storeKey));
 
         StoreCollection store = mongoTemplate.findOne(query, StoreCollection.class);
 

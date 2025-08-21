@@ -36,6 +36,4 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 
 	Page<Store> findByStoreAcceptStatusAndDeletedAtIsNull(
 		StoreAcceptStatus status, Pageable pageable);
-
-	Object findByStoreAcceptStatus(StoreAcceptStatus storeAcceptStatus, Pageable pageable);
 }

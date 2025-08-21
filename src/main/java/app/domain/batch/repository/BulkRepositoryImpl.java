@@ -72,6 +72,7 @@ public class BulkRepositoryImpl implements BulkRepository {
                 .join(s.category, category)
                 .leftJoin(category.parentCategory, parentCategory)
                 .leftJoin(parentCategory.parentCategory, grandparentCategory)
+                .where(s.deletedAt.isNull())
                 .where(lastStoreId == null ? Expressions.TRUE : s.storeId.gt(lastStoreId))
                 .orderBy(s.storeId.asc())
                 .limit(limit)
@@ -79,7 +80,7 @@ public class BulkRepositoryImpl implements BulkRepository {
 
         List<BulkDto> stores = tuples.stream().map(tuple -> {
             BulkDto dto = new BulkDto();
-            dto.setStoreId(tuple.get(s.storeId));
+            dto.setStoreKey(tuple.get(s.storeId));
             dto.setUserId(tuple.get(s.userId));
             dto.setStoreName(tuple.get(s.storeName));
             dto.setDescription(tuple.get(s.description));
@@ -113,7 +114,7 @@ public class BulkRepositoryImpl implements BulkRepository {
             return List.of();
         }
 
-        List<UUID> storeIds = stores.stream().map(BulkDto::getStoreId).toList();
+        List<UUID> storeIds = stores.stream().map(BulkDto::getStoreKey).toList();
         QMenu menu = QMenu.menu;
         List<Menu> menus = new JPAQuery<>(entityManager)
                 .select(menu)
@@ -126,7 +127,7 @@ public class BulkRepositoryImpl implements BulkRepository {
 
         return stores.stream()
                 .map(dto -> {
-                    List<Menu> storeMenus = menusByStoreId.getOrDefault(dto.getStoreId(), List.of());
+                    List<Menu> storeMenus = menusByStoreId.getOrDefault(dto.getStoreKey(), List.of());
                     try {
                         String menuJson = objectMapper.writeValueAsString(
                                 storeMenus.stream()

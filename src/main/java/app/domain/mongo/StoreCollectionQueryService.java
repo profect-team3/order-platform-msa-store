@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +34,15 @@ public class StoreCollectionQueryService {
         return mongoTemplate.find(query, StoreCollection.class);
     }
 
-    public Optional<StoreCollection> findStoreById(String storeId) {
-        StoreCollection store = mongoTemplate.findById(storeId, StoreCollection.class);
+    public Optional<StoreCollection> findStoreByStoreKey(String storeKey) {
+        Query query = new Query(Criteria.where("storeId").is(storeKey));
+
+        StoreCollection store = mongoTemplate.findOne(query, StoreCollection.class);
 
         if (store != null && store.getMenus() != null) {
             store.setMenus(store.getMenus().stream()
                 .filter(menu -> !menu.isHidden())
-                .collect(java.util.stream.Collectors.toList()));
+                .collect(Collectors.toList()));
         }
 
         return Optional.ofNullable(store);

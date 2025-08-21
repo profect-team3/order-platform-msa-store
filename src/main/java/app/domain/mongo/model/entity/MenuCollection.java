@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class MenuCollection {
-	@Id
 	private String menuId;
 	private String name;
 	private Integer price;

@@ -19,7 +19,7 @@ public class BulkReader implements ItemReader<BulkDto> {
 
     private final BulkRepository bulkRepository;
     private Iterator<BulkDto> storeIterator;
-    private UUID lastStoreId = null;
+    private UUID lastStoreKey = null;
     private boolean initialized = false;
     private final int batchSize = 100;
 
@@ -31,7 +31,7 @@ public class BulkReader implements ItemReader<BulkDto> {
 
         if (storeIterator != null && storeIterator.hasNext()) {
             BulkDto current = storeIterator.next();
-            lastStoreId = current.getStoreId();
+            lastStoreKey = current.getStoreKey();
             return current;
         }
 
@@ -39,7 +39,7 @@ public class BulkReader implements ItemReader<BulkDto> {
         if (!nextBatch.isEmpty()) {
             storeIterator = nextBatch.iterator();
             BulkDto current = storeIterator.next();
-            lastStoreId = current.getStoreId();
+            lastStoreKey = current.getStoreKey();
             return current;
         }
 
@@ -47,7 +47,7 @@ public class BulkReader implements ItemReader<BulkDto> {
     }
 
     private void initialize() {
-        lastStoreId = null; // 첫 번째 조회는 null부터 시작
+        lastStoreKey = null; // 첫 번째 조회는 null부터 시작
         List<BulkDto> firstBatch = loadNextBatch();
         if (!firstBatch.isEmpty()) {
             storeIterator = firstBatch.iterator();
@@ -56,12 +56,12 @@ public class BulkReader implements ItemReader<BulkDto> {
     }
 
     private List<BulkDto> loadNextBatch() {
-        return bulkRepository.findStoresWithDetailsCursor(lastStoreId, batchSize);
+        return bulkRepository.findStoresWithDetailsCursor(lastStoreKey, batchSize);
     }
 
     public void reset() {
         initialized = false;
-        lastStoreId = null;
+        lastStoreKey = null;
         storeIterator = null;
     }
 }

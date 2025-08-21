@@ -28,11 +28,11 @@ public class BulkWriter implements ItemWriter<StoreCollection> {
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, collectionName);
 
 		for (StoreCollection item : chunk) {
-			Query query = new Query(where("storeId").is(item.getStoreId()));
+			Query query = new Query(where("storeKey").is(item.getStoreKey()));
 
 			Update update = new Update();
 			update.set("userId", item.getUserId());
-			update.set("storeId", item.getStoreId());
+			update.set("storeKey", item.getStoreKey());
 			update.set("storeName", item.getStoreName());
 			update.set("description", item.getDescription());
 			update.set("categoryKeys", item.getCategoryKeys());

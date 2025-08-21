@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import app.domain.store.client.ReviewClient;
 import app.domain.store.model.StoreQueryRepository;
@@ -41,10 +43,12 @@ public class CustomerStoreService {
 		List<UUID> ids = page.getContent().stream()
 			.map(Store::getStoreId)
 			.toList();
-
-		ApiResponse<List<ReviewClient.StoreReviewResponse>> storeReviewResponse = reviewClient.getStoreReviewAverage(ids);
-		if(!storeReviewResponse.isSuccess()){
+		ApiResponse<List<ReviewClient.StoreReviewResponse>> storeReviewResponse;
+		try{
+			storeReviewResponse = reviewClient.getStoreReviewAverage(ids);
+		} catch (HttpClientErrorException | HttpServerErrorException e){
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+
 		}
 
 		List<ReviewClient.StoreReviewResponse> storeReviewResponses =storeReviewResponse.result();
@@ -69,14 +73,14 @@ public class CustomerStoreService {
 	}
 	@Transactional(readOnly = true)
 	public GetCustomerStoreDetailResponse getApproveStoreDetail(UUID storeId) {
-		// 1) 스토어 검증
 		Store store = storeRepository
 			.findByStoreIdAndStoreAcceptStatusAndDeletedAtIsNull(storeId, StoreAcceptStatus.APPROVE)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
 
-		// 2) 리뷰 평균(요약) 조회
-		ApiResponse<List<ReviewClient.StoreReviewResponse>> storeReviewResponse = reviewClient.getStoreReviewAverage(List.of(storeId));
-		if(!storeReviewResponse.isSuccess()){
+		ApiResponse<List<ReviewClient.StoreReviewResponse>> storeReviewResponse;
+		try{
+			storeReviewResponse = reviewClient.getStoreReviewAverage(List.of(storeId));
+		} catch (HttpClientErrorException | HttpServerErrorException e){
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
 		}
 

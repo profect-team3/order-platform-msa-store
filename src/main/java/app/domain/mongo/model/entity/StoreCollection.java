@@ -17,6 +17,8 @@ import lombok.Setter;
 @Document(collection = "stores")
 @CompoundIndex(name = "store_search_index", def = "{'categoryKeys': 1, 'regionName': 1, 'isActive': 1}")
 public class StoreCollection {
+    @Id
+    private String id;
 	private Long userId;
 	private String storeKey;
 	private String storeName;

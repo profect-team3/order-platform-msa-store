@@ -64,7 +64,6 @@ class InternalMenuServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 테스트 실행 전, 기존 데이터 삭제
         stockRepository.deleteAll();
         menuRepository.deleteAll();
         storeRepository.deleteAll();

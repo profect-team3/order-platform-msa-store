@@ -47,26 +47,26 @@ public class StoreCollectionQueryServiceTest {
     private StoreCollection createTestStore(String storeKey, String storeName, boolean isHiddenMenu) {
         MenuCollection menu = new MenuCollection(UUID.randomUUID().toString(), "Test Menu", 10000, "A delicious test menu", "CHICKEN", isHiddenMenu);
         return new StoreCollection(
-            UUID.randomUUID().toString(),      // id
-            1L,                                // userId
-            storeKey,                          // storeKey
-            storeName,                         // storeName
-            "Test Description",                // description
-            List.of("CHICKEN"),                // categoryKeys
-            4.5,                               // avgRating
-            10L,                               // reviewCount
-            "010-1234-5678",                   // phoneNumber
-            10000L,                            // minOrderAmount
-            "Test Address",                    // address
-            "GANGNAM",                         // regionName
-            "SEOUL GANGNAM",                   // regionFullName
-            "APPROVED",                        // storeAcceptStatus
-            true,                              // isActive
-            null,                              // createdAt
-            null,                              // updatedAt
-            null,                              // deletedAt
-            1L,                                // version
-            List.of(menu)                      // menus
+            UUID.randomUUID().toString(),
+            1L,
+            storeKey,
+            storeName,
+            "Test Description",
+            List.of("CHICKEN"),
+            4.5,
+            10L,
+            "010-1234-5678",
+            10000L,
+            "Test Address",
+            "GANGNAM",
+            "SEOUL GANGNAM",
+            "APPROVED",
+            true,
+            null,
+            null,
+            null,
+            1L,
+            List.of(menu)
         );
     }
 

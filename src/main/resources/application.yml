@@ -24,9 +24,9 @@ spring:
         show_sql: true
   data:
     mongodb:
-      host: localhost
+      host: ${MONGODB_HOST:localhost}
       port: 27017
-      database: store-db
+      database: ${MONGO_NAME:store-db}
       username: ${MONGO_INITDB_ROOT_USERNAME}
       password: ${MONGO_INITDB_ROOT_PASSWORD}
       authentication-database: admin

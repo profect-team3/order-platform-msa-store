@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 public class BulkDto {
-	private UUID storeId;
+	private UUID storeKey;
 	private Long userId;
 	private String storeName;
 	private String description;

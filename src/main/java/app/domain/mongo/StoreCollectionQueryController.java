@@ -32,11 +32,11 @@ public class StoreCollectionQueryController {
         }
     }
 
-    @GetMapping("/{storeId}")
+    @GetMapping("/{storeKey}")
     @Operation(summary = "메뉴 포함 상세 조회 API", description = "가게 ID를 사용하여 모든 메뉴(보임 처리)를 불러옵니다.")
-    @Parameter(name = "storeId", description = "조회할 가게의 ID", required = true)
-    public ApiResponse<StoreCollection> getStoreById(@PathVariable String storeId) {
-        return storeCollectionQueryService.findStoreById(storeId)
+    @Parameter(name = "storeId", description = "조회할 가게의 Key", required = true)
+    public ApiResponse<StoreCollection> getStoreByKey(@PathVariable String storeKey) {
+        return storeCollectionQueryService.findStoreByStoreKey(storeKey)
             .map(store -> ApiResponse.onSuccess(MongoStoreMenuSuccessCode.MENU_GET_SUCCESS, store))
             .orElse(ApiResponse.onFailure(MongoStoreMenuErrorCode.MENU_NOT_FOUND, null));
     }

@@ -2,6 +2,7 @@ package app.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -21,6 +22,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -161,7 +165,7 @@ public class StoreCollectionQueryServiceTest {
         verify(mongoTemplate).find(queryCaptor.capture(), eq(StoreCollection.class));
         Query capturedQuery = queryCaptor.getValue();
 
-        String expectedQuery = "{\"menus.name\":{\"$regularExpression\":{\"pattern\":\"TestMenu\",\"options\":\"i\"}}}";
+        String expectedQuery = "{\"menus.name\":{\"$regularExpression\":{\"pattern\":\"Test Menu\",\"options\":\"i\"}}}";
         assertEquals(expectedQuery, capturedQuery.getQueryObject().toJson().replaceAll("\\s", ""));
         assertFalse(result.isEmpty());
     }
@@ -181,7 +185,8 @@ public class StoreCollectionQueryServiceTest {
         verify(mongoTemplate).aggregate(aggregationCaptor.capture(), eq("storeCollection"), eq(StoreCollection.class));
         Aggregation capturedAggregation = aggregationCaptor.getValue();
 
-        String expectedAggregation = "{\"aggregate\":\"storeCollection\",\"pipeline\":[{\"$match\":{\"menus.name\":{\"$regularExpression\":{\"pattern\":\"TestMenu\",\"options\":\"i\"}}}},{\"$project\":{\"storeName\":1,\"description\":1,\"avgRating\":1,\"phoneNumber\":1,\"minOrderAmount\":1,\"address\":1,\"menus\":{\"$filter\":{\"input\":\"$menus\",\"as\":\"menu\",\"cond\":{\"$regexMatch\":{\"input\":\"$$menu.name\",\"regex\":\"TestMenu\",\"options\":\"i\"}}}}}}]}";
+        String expectedAggregation = """
+            {"aggregate":"storeCollection","pipeline":[{"$match":{"menus.name":{"$regularExpression":{"pattern":"TestMenu","options":"i"}}}},{"$project":{"storeName":1,"description":1,"avgRating":1,"phoneNumber":1,"minOrderAmount":1,"address":1,"menus":{"$filter":{"input":"$menus","as":"menu","cond":{"$regexMatch":{"input":"$menu.name","regex":"TestMenu","options":"i"}}}}}}]}""";
         assertEquals(expectedAggregation, capturedAggregation.toString().replaceAll("__collection__", "storeCollection").replaceAll("\\s", ""));
         assertFalse(result.isEmpty());
     }
@@ -189,12 +194,17 @@ public class StoreCollectionQueryServiceTest {
     @Test
     @DisplayName("전체 가게 조회(findAllStores) 테스트")
     void findAllStoresTest() {
+        Pageable pageable = PageRequest.of(0, 10);
         StoreCollection store = createTestStore(UUID.randomUUID().toString(), "Test Store", false);
-        when(mongoTemplate.findAll(StoreCollection.class)).thenReturn(List.of(store));
+        List<StoreCollection> storeList = List.of(store);
+        when(mongoTemplate.find(any(Query.class), eq(StoreCollection.class))).thenReturn(storeList);
+        when(mongoTemplate.count(any(Query.class), eq(StoreCollection.class))).thenReturn((long) storeList.size());
 
-        List<StoreCollection> result = storeCollectionQueryService.findAllStores();
+        Page<StoreCollection> result = storeCollectionQueryService.findAllStores(pageable);
 
-        verify(mongoTemplate).findAll(StoreCollection.class);
-        assertEquals(1, result.size());
+        verify(mongoTemplate).find(any(Query.class), eq(StoreCollection.class));
+        verify(mongoTemplate).count(any(Query.class), eq(StoreCollection.class));
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
     }
 }

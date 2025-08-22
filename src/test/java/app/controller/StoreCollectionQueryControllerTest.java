@@ -1,5 +1,6 @@
 package app.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,7 +17,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -135,20 +138,22 @@ public class StoreCollectionQueryControllerTest {
         @DisplayName("성공: 전체 가게 목록 조회")
         void getAllStores_Success() throws Exception {
             StoreCollection testStore = createTestStore(UUID.randomUUID().toString(), "Test Store");
-            when(storeCollectionQueryService.findAllStores()).thenReturn(Collections.singletonList(testStore));
+            Page<StoreCollection> pagedResponse = new PageImpl<>(Collections.singletonList(testStore));
+            when(storeCollectionQueryService.findAllStores(any(Pageable.class))).thenReturn(pagedResponse);
 
-            mockMvc.perform(get("/mongo/stores"))
+            mockMvc.perform(get("/mongo/stores").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result[0].storeName").value("Test Store"));
+                .andExpect(jsonPath("$.result.content[0].storeName").value("Test Store"));
         }
 
         @Test
         @WithMockUser
         @DisplayName("성공: 가게 목록 없음")
         void getAllStores_NotFound() throws Exception {
-            when(storeCollectionQueryService.findAllStores()).thenReturn(Collections.emptyList());
+            Page<StoreCollection> pagedResponse = new PageImpl<>(Collections.emptyList());
+            when(storeCollectionQueryService.findAllStores(any(Pageable.class))).thenReturn(pagedResponse);
 
-            mockMvc.perform(get("/mongo/stores"))
+            mockMvc.perform(get("/mongo/stores").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(false));
         }

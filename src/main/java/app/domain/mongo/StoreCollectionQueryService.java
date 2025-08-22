@@ -3,6 +3,9 @@ package app.domain.mongo;
 import app.domain.mongo.model.entity.StoreCollection;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
@@ -76,7 +79,7 @@ public class StoreCollectionQueryService {
                         new Document("input", "$menus")
                                 .append("as", "menu")
                                 .append("cond", new Document("$regexMatch",
-                                        new Document("input", "$$menu.name")
+                                        new Document("input", "$menu.name")
                                                 .append("regex", menuNameKeyword)
                                                 .append("options", "i")
                                 ))
@@ -87,7 +90,10 @@ public class StoreCollectionQueryService {
         return mongoTemplate.aggregate(aggregation, "storeCollection", StoreCollection.class).getMappedResults();
     }
 
-    public List<StoreCollection> findAllStores() {
-        return mongoTemplate.findAll(StoreCollection.class);
+    public Page<StoreCollection> findAllStores(Pageable pageable) {
+        Query query = new Query().with(pageable);
+        List<StoreCollection> stores = mongoTemplate.find(query, StoreCollection.class);
+        long total = mongoTemplate.count(new Query(), StoreCollection.class);
+        return new PageImpl<>(stores, pageable, total);
     }
 }

@@ -6,12 +6,12 @@ COPY gradle ./gradle
 COPY order-platform-msa-store ./order-platform-msa-store
 COPY order-platform-msa-store/build.cloud.gradle ./order-platform-msa-store/build.gradle
 
-RUN ./gradlew :order-platform-msa-store:build -x test
+RUN ./gradlew :order-platform-msa-store:bootJar -x test
 
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:17-jre-slim
 WORKDIR /app
 
-COPY --from=builder /workspace/order-platform-msa-store/build/libs/*.jar /app/application.jar
+COPY --from=builder /workspace/order-platform-msa-store/build/libs/*-boot.jar /app/application.jar
 
 EXPOSE 8082
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "/app/application.jar"]

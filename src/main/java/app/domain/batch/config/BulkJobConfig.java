@@ -8,6 +8,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import app.domain.batch.dto.BulkDto;
@@ -44,6 +45,9 @@ public class BulkJobConfig {
 			.reader(bulkReader)
 			.processor(bulkProcessor)
 			.writer(bulkWriter)
+			.faultTolerant()
+			.retryLimit(3)
+			.retry(DuplicateKeyException.class)
 			.build();
 	}
 

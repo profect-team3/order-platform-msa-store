@@ -1,5 +1,4 @@
-venv-locust/
-
+./.claude
 HELP.md
 .gradle
 build/

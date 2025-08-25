@@ -31,8 +31,8 @@ public enum StoreErrorCode implements BaseCode {
 	INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "STORE016", "권한이 없습니다."),
 
 	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE017", "해당 주문을 찾을 수 없습니다."),
-	NOT_STORE_OWNER(HttpStatus.FORBIDDEN, "STORE018", "해당 가게의 점주가 아닙니다.");
-
+	NOT_STORE_OWNER(HttpStatus.FORBIDDEN, "STORE018", "해당 가게의 점주가 아닙니다."),
+	INVALID_STORE_STATUS(HttpStatus.NOT_FOUND,"STORE019","이미 처리된 상태명 입니다.");
 	private final HttpStatus httpStatus;
 	private final String code;
 	private final String message;

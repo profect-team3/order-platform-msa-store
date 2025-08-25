@@ -2,6 +2,9 @@ package app.domain.menu.model.dto.response;
 
 import java.util.UUID;
 
+import lombok.Builder;
+
+@Builder
 public class MenuUpdateResponse {
     private UUID menuId;
     private String name;

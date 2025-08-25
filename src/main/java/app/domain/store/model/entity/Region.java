@@ -33,6 +33,7 @@ public class Region extends BaseEntity {
 	private String regionName;
 
 	@Column(nullable = false)
+	@Builder.Default
 	private boolean isActive = false;
 
 	@Column(nullable = false)

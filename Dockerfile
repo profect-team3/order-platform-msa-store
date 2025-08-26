@@ -7,8 +7,10 @@ COPY gradlew.bat .
 COPY gradle ./gradle
 
 COPY build.cloud.gradle build.gradle
+COPY settings.gradle .
 
 COPY src ./src
+COPY libs ./libs
 
 RUN ./gradlew bootJar -x test
 

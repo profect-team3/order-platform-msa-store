@@ -96,8 +96,14 @@ public class DiscordListener implements JobExecutionListener {
     }
 
     private void sendMessageToDiscord(String message) {
+        final int MAX_LENGTH = 2000;
+        String truncatedMessage = message;
+        if (truncatedMessage.length() > MAX_LENGTH) {
+            truncatedMessage = truncatedMessage.substring(0, MAX_LENGTH - 50) + "\n\n...(메시지가 너무 길어 잘렸습니다.)";
+        }
+
         Map<String, String> payload = new HashMap<>();
-        payload.put("content", message);
+        payload.put("content", truncatedMessage);
 
         try {
             restTemplate.postForEntity(discordWebhookUrl, payload, String.class);

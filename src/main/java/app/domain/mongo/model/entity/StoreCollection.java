@@ -48,7 +48,8 @@ public class StoreCollection {
 	private Date deletedAt;
 
 	@Field("version")
-	private Long version;
+	@org.springframework.data.annotation.Version
+	private Long version = 0L;
 	@TextIndexed
 	private List<MenuCollection> menus;
 

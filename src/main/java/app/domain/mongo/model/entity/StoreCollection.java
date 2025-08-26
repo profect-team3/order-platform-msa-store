@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -24,9 +25,12 @@ public class StoreCollection {
     @Id
     private String id;
 	private Long userId;
+	@Indexed(name = "store_key_index", unique = true)
 	private String storeKey;
+	@TextIndexed(weight = 3)
 	private String storeName;
 	private String description;
+	@TextIndexed(weight = 2)
 	private List<String> categoryKeys;
 	private Double avgRating;
 	private Long reviewCount;
@@ -45,6 +49,7 @@ public class StoreCollection {
 
 	@Field("version")
 	private Long version;
+	@TextIndexed
 	private List<MenuCollection> menus;
 
 }

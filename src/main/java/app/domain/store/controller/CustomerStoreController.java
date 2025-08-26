@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/store/customer/store")
+@RequestMapping("/store/customer")
 @RequiredArgsConstructor
 @Tag(name = "사용자 API", description = "사용자의 가게 조회")
 @PreAuthorize("hasRole('CUSTOMER')")

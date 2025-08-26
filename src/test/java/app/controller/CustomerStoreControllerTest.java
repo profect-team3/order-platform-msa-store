@@ -69,7 +69,7 @@ class CustomerStoreControllerTest {
 		Page<GetStoreListResponse> page = new PageImpl<>(stores, PageRequest.of(0, 20), stores.size());
 		given(customerStoreService.getApprovedStore(any())).willReturn(PagedResponse.from(page));
 
-		mockMvc.perform(get("/customer/store").with(csrf())
+		mockMvc.perform(get("/store/customer").with(csrf())
 				.param("page", "0")
 				.param("size", "20")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -96,7 +96,7 @@ class CustomerStoreControllerTest {
 			.build();
 		given(customerStoreService.getApproveStoreDetail(storeId)).willReturn(response);
 
-		mockMvc.perform(get("/customer/store/{storeId}", storeId).with(csrf()))
+		mockMvc.perform(get("/store/customer/{storeId}", storeId).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.storeName").value("맛집1"))
 			.andExpect(jsonPath("$.result.phoneNumber").value("010-1234-5678"));
@@ -119,7 +119,7 @@ class CustomerStoreControllerTest {
 		Page<GetStoreListResponse> page = new PageImpl<>(stores, PageRequest.of(0, 10), 1);
 		given(customerStoreService.searchStoresByStatus(eq(keyword), any(),any(),any())).willReturn(PagedResponse.from(page));
 
-		mockMvc.perform(get("/customer/store/search").with(csrf())
+		mockMvc.perform(get("/store/customer/search").with(csrf())
 				.param("keyword", keyword)
 				.param("page", "0")
 				.param("size", "10"))
@@ -138,7 +138,7 @@ class CustomerStoreControllerTest {
 			.willReturn(PagedResponse.from(emptyPage));
 
 		// when & then
-		mockMvc.perform(get("/customer/store/search").with(csrf())
+		mockMvc.perform(get("/store/customer/search").with(csrf())
 				.param("keyword", "없는키워드")
 				.param("page", "0")
 				.param("size", "10"))
@@ -156,7 +156,7 @@ class CustomerStoreControllerTest {
 			.willThrow(new GeneralException(ErrorStatus.STORE_NOT_FOUND));
 
 		// when & then
-		mockMvc.perform(get("/customer/store/{storeId}", storeId).with(csrf()))
+		mockMvc.perform(get("/store/customer/{storeId}", storeId).with(csrf()))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.isSuccess").value(false))
 			.andExpect(jsonPath("$.code").value(ErrorStatus.STORE_NOT_FOUND.getCode()))

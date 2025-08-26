@@ -165,7 +165,7 @@ public class StoreCollectionQueryServiceTest {
         verify(mongoTemplate).find(queryCaptor.capture(), eq(StoreCollection.class));
         Query capturedQuery = queryCaptor.getValue();
 
-        String expectedQuery = "{\"menus.name\":{\"$regularExpression\":{\"pattern\":\"Test Menu\",\"options\":\"i\"}}}";
+        String expectedQuery = "{\"menus.name\":{\"$regularExpression\":{\"pattern\":\"TestMenu\",\"options\":\"i\"}}}";
         assertEquals(expectedQuery, capturedQuery.getQueryObject().toJson().replaceAll("\\s", ""));
         assertFalse(result.isEmpty());
     }

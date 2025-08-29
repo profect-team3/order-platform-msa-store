@@ -13,6 +13,8 @@ COPY src ./src
 COPY libs ./libs
 
 RUN ./gradlew bootJar -x test
+RUN sudo apt update && sudo apt install wget
+RUN wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 
 FROM eclipse-temurin:17-jre-jammy
 

@@ -174,7 +174,7 @@ public class StoreCollectionQueryServiceTest {
     @DisplayName("메뉴 이름으로 필터링(filterStoresByMenuNameAndReturnFilteredMenus) 테스트")
     void filterStoresByMenuNameAndReturnFilteredMenusTest() {
         String menuName = "Test Menu";
-        StoreCollection store = createTestStore(UUID.randomUUID().toString(), "My Store", false);
+        StoreCollection store = createTestStore(UUID.randomUUID().toString(), "MyStore", false);
         @SuppressWarnings("unchecked")
         AggregationResults<StoreCollection> aggregationResults = new AggregationResults<>(List.of(store), new Document());
         when(mongoTemplate.aggregate(any(Aggregation.class), anyString(), eq(StoreCollection.class))).thenReturn(aggregationResults);

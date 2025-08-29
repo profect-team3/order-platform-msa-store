@@ -6,10 +6,7 @@ spring:
 
   data:
     mongodb:
-      host: ${MONGODB_HOST}
-      database: ${MONGO_NAME}
-      username: ${MONGO_INITDB_ROOT_USERNAME}
-      password: ${MONGO_INITDB_ROOT_PASSWORD}
+      uri:  mongodb://${username}:${password}@${host}:27017/${MONGO_NAME}?tls=true&tlsCAFile=/app/global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false
 
   security:
     oauth2:
@@ -22,4 +19,4 @@ jwt:
 
 discord:
   webhook:
-    url: ${DISCORD_URL}
+    url: "https://discord.com/api/webhooks/1406866286629355540/Y4r06Y2UIA5IjkrG_JqWC1P_u0xC9GuTmdR0N-ji6eQiuNDsyu_wToA0RcEAjhlWpSEU"

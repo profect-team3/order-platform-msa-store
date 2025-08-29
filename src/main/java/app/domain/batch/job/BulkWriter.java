@@ -38,17 +38,22 @@ public class BulkWriter implements ItemWriter<StoreCollection> {
 		List<StoreCollection> existingStores = mongoTemplate.find(versionQuery, StoreCollection.class, "stores");
 
 		Map<String, Long> versionMap = existingStores.stream()
-				.collect(Collectors.toMap(StoreCollection::getStoreKey, StoreCollection::getVersion));
-
-		for (StoreCollection item : chunk) {
-			item.setVersion(versionMap.get(item.getStoreKey()));
-		}
+				.collect(Collectors.toMap(StoreCollection::getStoreKey, StoreCollection::getVersion, (oldValue, newValue) -> oldValue));
 
 		String collectionName = "stores";
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, collectionName);
 
 		for (StoreCollection item : chunk) {
-			Query query = new Query(where("storeKey").is(item.getStoreKey()).and("version").is(item.getVersion()));
+			Query query;
+			Long existingVersion = versionMap.get(item.getStoreKey());
+
+			if (existingVersion != null) {
+				// Item exists, use optimistic locking
+				query = new Query(where("storeKey").is(item.getStoreKey()).and("version").is(existingVersion));
+			} else {
+				// New item, do not include version in query
+				query = new Query(where("storeKey").is(item.getStoreKey()));
+			}
 
 			Update update = new Update();
 			update.set("userId", item.getUserId());

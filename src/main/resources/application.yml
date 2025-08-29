@@ -9,9 +9,9 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:localhost:5432}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:pass}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -27,8 +27,8 @@ spring:
       host: ${MONGODB_HOST:localhost}
       port: 27017
       database: ${MONGO_NAME:store-db}
-      username: ${MONGO_INITDB_ROOT_USERNAME}
-      password: ${MONGO_INITDB_ROOT_PASSWORD}
+      username: ${MONGO_INITDB_ROOT_USERNAME:root}
+      password: ${MONGO_INITDB_ROOT_PASSWORD:profectcloud}
       authentication-database: admin
   batch:
     job:
@@ -50,6 +50,6 @@ jwt:
 
 discord:
   webhook:
-    url: ${DISCORD_URL}
+    url: ${DISCORD_URL:https://discord.com/api/webhooks/1406866286629355540/Y4r06Y2UIA5IjkrG_JqWC1P_u0xC9GuTmdR0N-ji6eQiuNDsyu_wToA0RcEAjhlWpSEU}
 server:
   port: 8082

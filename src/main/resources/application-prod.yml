@@ -6,10 +6,7 @@ spring:
 
   data:
     mongodb:
-      host: ${MONGODB_HOST}
-      database: ${MONGO_NAME:store-db}
-      username: ${MONGO_INITDB_ROOT_USERNAME}
-      password: ${MONGO_INITDB_ROOT_PASSWORD}
+      uri:  mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:27017/${MONGO_NAME}?tls=true&tlsCAFile=/app/global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false
 
   security:
     oauth2:

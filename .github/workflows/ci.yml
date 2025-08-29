@@ -26,6 +26,6 @@ jobs:
       - name: Build & Push store service
         run: |
           docker build -f Dockerfile -t order-test-ecr-store:latest .
-          # docker tag order-test-ecr-store:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-test-ecr-store:latest
-          # docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-test-ecr-store:latest
+          docker tag order-test-ecr-store:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-test-ecr-store:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-test-ecr-store:latest
 

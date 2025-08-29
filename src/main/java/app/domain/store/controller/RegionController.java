@@ -12,6 +12,7 @@ import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.store.service.RegionService;
 import app.domain.store.status.StoreErrorCode;
 import app.domain.store.status.StoreSuccessStatus;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController

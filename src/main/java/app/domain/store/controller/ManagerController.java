@@ -14,19 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.PagedResponse;
 import app.domain.store.service.ManagerService;
 import app.domain.store.model.dto.response.GetStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.status.ManagerSuccessStatus;
 import app.domain.store.status.StoreAcceptStatus;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/manager")
+@RequestMapping("/store/manager")
 @RequiredArgsConstructor
 @Tag(name = "관리자 API", description = "관리자의 사용자 관리 API")
 @PreAuthorize("hasRole('MANAGER')")
@@ -34,7 +34,7 @@ public class ManagerController {
 
 	private final ManagerService managerService;
 
-	@GetMapping("/store")
+	@GetMapping()
 	@Operation(
 		summary = "전체 가게 목록 조회",
 		description = "가게 목록을 페이지 별로 조회합니다. 생성일 또는 수정일 기준으로 정렬할 수 있습니다.")
@@ -47,7 +47,7 @@ public class ManagerController {
 	}
 
 
-	@GetMapping("/store/{storeId}")
+	@GetMapping("/{storeId}")
 	@Operation(
 		summary = "선택한 가게 상세 정보 조회",
 		description = "가게의 점주의 정보 및 가게의 정보를 조회 합니다")
@@ -57,7 +57,7 @@ public class ManagerController {
 		return ApiResponse.onSuccess(ManagerSuccessStatus.MANAGER_GET_STORE_DETAIL_OK,managerService.getStoreDetail(storeId));
 	}
 
-	@PatchMapping("/store/{storeId}/accept")
+	@PatchMapping("/{storeId}/accept")
 	@Operation(
 		summary = "선택한 가게 상태를 수정 합니다.",
 		description = "가게의 등록요청을 거절하거나 승인 합니다.")
@@ -68,7 +68,7 @@ public class ManagerController {
 		return ApiResponse.onSuccess(ManagerSuccessStatus.MANAGER_UPDATE_STORE_STATUS_OK,managerService.approveStore(storeId, status));
 	}
 
-	@GetMapping("/store/search")
+	@GetMapping("/search")
 	@Operation(
 		summary = "가게를 검색합니다.",
 		description = "가게 제목에 따라서 검색 합니다.")

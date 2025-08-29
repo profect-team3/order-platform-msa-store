@@ -19,12 +19,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import app.commonUtil.apiPayload.PagedResponse;
 import app.domain.store.controller.ManagerController;
 import app.domain.store.model.dto.response.GetStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.service.ManagerService;
 import app.domain.store.status.StoreAcceptStatus;
-import app.global.apiPayload.PagedResponse;
 
 @WebMvcTest(ManagerController.class)
 @DisplayName("ManagerController Test")
@@ -51,7 +51,7 @@ class ManagerControllerTest {
 			.thenReturn(mockResponse);
 
 		// when & then
-		mockMvc.perform(get("/manager/store")
+		mockMvc.perform(get("/store/manager")
 				.with(csrf())
 				.param("status", "PENDING")
 				.param("page", "0")
@@ -86,7 +86,7 @@ class ManagerControllerTest {
 		when(managerService.getStoreDetail(storeId)).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/manager/store/{storeId}", storeId).with(csrf()))
+		mockMvc.perform(get("/store/manager/{storeId}", storeId).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.result").exists());
 	}
@@ -103,7 +103,7 @@ class ManagerControllerTest {
 		when(managerService.approveStore(storeId, status)).thenReturn(message);
 
 		// when & then
-		mockMvc.perform(patch("/manager/store/{storeId}/accept", storeId).with(csrf())
+		mockMvc.perform(patch("/store/manager/{storeId}/accept", storeId).with(csrf())
 				.param("status", status.name()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.result").value(message));
@@ -129,7 +129,7 @@ class ManagerControllerTest {
 			.thenReturn(mockResponse);
 
 		// when & then
-		mockMvc.perform(get("/manager/store/search")
+		mockMvc.perform(get("/store/manager/search")
 				.param("keyword", keyword)
 				.param("category", category)
 				.param("status", status.name()))

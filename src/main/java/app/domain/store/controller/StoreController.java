@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import app.commonSecurity.TokenPrincipalParser;
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.exception.GeneralException;
+import app.commonUtil.security.TokenPrincipalParser;
 import app.domain.store.service.StoreService;
 import app.domain.store.model.dto.response.GetReviewResponse;
 import app.domain.menu.model.dto.response.MenuListResponse;
@@ -28,15 +30,13 @@ import app.domain.store.repository.RegionRepository;
 import app.domain.store.repository.StoreRepository;
 import app.domain.store.status.StoreErrorCode;
 import app.domain.store.status.StoreSuccessStatus;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.exception.GeneralException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Store", description = "가게, 가게 메뉴 관리")
 @RestController
-@RequestMapping("/owner")
+@RequestMapping("/store/owner")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('OWNER')")
 public class StoreController {

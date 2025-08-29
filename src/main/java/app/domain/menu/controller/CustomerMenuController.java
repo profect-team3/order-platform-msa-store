@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.PagedResponse;
 import app.domain.menu.service.CustomerMenuService;
 import app.domain.menu.model.dto.response.GetMenuListResponse;
 import app.domain.menu.status.StoreMenuSuccessStatus;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/store/menu")
 @RequiredArgsConstructor
 @Tag(name = "사용자 API", description = "사용자의 메뉴관련 API")
 @PreAuthorize("hasRole('CUSTOMER')")

@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import app.commonUtil.apiPayload.ApiResponse;
 import app.domain.store.model.dto.response.OrderInfo;
 import app.domain.store.model.dto.response.StoreOrderInfo;
-import app.global.apiPayload.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @Component

@@ -15,15 +15,15 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.PagedResponse;
+import app.commonUtil.apiPayload.code.status.ErrorStatus;
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.store.client.ReviewClient;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.model.entity.QStore;
 import app.domain.store.model.entity.Store;
 import app.domain.store.status.StoreAcceptStatus;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.PagedResponse;
-import app.global.apiPayload.code.status.ErrorStatus;
-import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 
 

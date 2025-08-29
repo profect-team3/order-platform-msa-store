@@ -1,9 +1,9 @@
 package app.domain.mongo;
 
+import app.commonUtil.apiPayload.ApiResponse;
 import app.domain.mongo.model.entity.StoreCollection;
 import app.domain.mongo.status.MongoStoreMenuErrorCode;
 import app.domain.mongo.status.MongoStoreMenuSuccessCode;
-import app.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mongo/stores")
+@RequestMapping("/store/mongo")
 @Tag(name = "MongoDB Store Query API", description = "MongoDB 기반 가게 검색 API")
 public class StoreCollectionQueryController {
 

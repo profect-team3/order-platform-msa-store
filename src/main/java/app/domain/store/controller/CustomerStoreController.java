@@ -11,19 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.PagedResponse;
 import app.domain.store.service.CustomerStoreService;
 import app.domain.store.model.dto.response.GetCustomerStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.status.StoreAcceptStatus;
 import app.domain.store.status.StoreSuccessStatus;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/customer/store")
+@RequestMapping("/store/customer")
 @RequiredArgsConstructor
 @Tag(name = "사용자 API", description = "사용자의 가게 조회")
 @PreAuthorize("hasRole('CUSTOMER')")

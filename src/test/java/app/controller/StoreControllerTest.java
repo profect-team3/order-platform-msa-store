@@ -27,7 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import app.commonSecurity.TokenPrincipalParser;
+import app.commonUtil.apiPayload.exception.GeneralException;
+import app.commonUtil.security.TokenPrincipalParser;
 import app.domain.menu.model.dto.response.MenuListResponse;
 import app.domain.store.controller.StoreController;
 import app.domain.store.model.dto.request.StoreApproveRequest;
@@ -42,7 +43,6 @@ import app.domain.store.repository.StoreRepository;
 import app.domain.store.service.StoreService;
 import app.domain.store.status.StoreErrorCode;
 import app.domain.store.status.StoreSuccessStatus;
-import app.global.apiPayload.exception.GeneralException;
 
 @WebMvcTest(StoreController.class)
 @DisplayName("StoreController 테스트")
@@ -99,7 +99,7 @@ public class StoreControllerTest {
             when(storeService.createStore(any(StoreApproveRequest.class), anyLong())).thenReturn(expectedResponse);
 
             // when & then
-            mockMvc.perform(post("/owner")
+            mockMvc.perform(post("/store/owner")
                     .with(csrf()) // CSRF 토큰 추가
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -127,7 +127,7 @@ public class StoreControllerTest {
             when(storeService.updateStoreInfo(any(StoreInfoUpdateRequest.class), anyLong())).thenReturn(expectedResponse);
 
             // when & then
-            mockMvc.perform(put("/owner")
+            mockMvc.perform(put("/store/owner")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -151,7 +151,7 @@ public class StoreControllerTest {
             doNothing().when(storeService).deleteStore(any(UUID.class), anyLong());
 
             // when & then
-            mockMvc.perform(delete("/owner/{storeId}", TEST_STORE_ID).with(csrf()))
+            mockMvc.perform(delete("/store/owner/{storeId}", TEST_STORE_ID).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(StoreSuccessStatus.STORE_DELETED_SUCCESS.getCode()));
 
@@ -173,7 +173,7 @@ public class StoreControllerTest {
             when(storeService.getStoreMenuList(any(UUID.class), anyLong())).thenReturn(expectedResponse);
 
             // when & then
-            mockMvc.perform(get("/owner/{storeId}/menu", TEST_STORE_ID))
+            mockMvc.perform(get("/store/owner/{storeId}/menu", TEST_STORE_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.storeId").value(TEST_STORE_ID.toString()));
 
@@ -191,7 +191,7 @@ public class StoreControllerTest {
             when(storeService.getStoreReviewList(any(UUID.class), anyLong())).thenReturn(expectedResponse);
 
             // when & then
-            mockMvc.perform(get("/owner/{storeId}/review", TEST_STORE_ID))
+            mockMvc.perform(get("/store/owner/{storeId}/review", TEST_STORE_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result[0].content").value("맛있어요"));
 
@@ -209,7 +209,7 @@ public class StoreControllerTest {
             when(storeService.getStoreOrderList(any(UUID.class), anyLong())).thenReturn(expectedResponse);
 
             // when & then
-            mockMvc.perform(get("/owner/{storeId}/order", TEST_STORE_ID))
+            mockMvc.perform(get("/store/owner/{storeId}/order", TEST_STORE_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.storeId").value(TEST_STORE_ID.toString()));
 
@@ -230,7 +230,7 @@ public class StoreControllerTest {
             doNothing().when(storeService).acceptOrder(any(UUID.class), anyLong());
 
             // when & then
-            mockMvc.perform(post("/owner/order/{orderId}/accept", orderId).with(csrf()))
+            mockMvc.perform(post("/store/owner/order/{orderId}/accept", orderId).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(StoreSuccessStatus.ORDER_ACCEPTED_SUCCESS.getCode()));
 
@@ -246,7 +246,7 @@ public class StoreControllerTest {
             doNothing().when(storeService).rejectOrder(any(UUID.class), anyLong());
 
             // when & then
-            mockMvc.perform(post("/owner/order/{orderId}/reject", orderId).with(csrf()))
+            mockMvc.perform(post("/store/owner/order/{orderId}/reject", orderId).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(StoreSuccessStatus.ORDER_REJECTED_SUCCESS.getCode()));
 
@@ -262,7 +262,7 @@ public class StoreControllerTest {
             doThrow(new GeneralException(StoreErrorCode.STORE_NOT_FOUND)).when(storeService).acceptOrder(any(UUID.class), anyLong());
 
             // when & then
-            mockMvc.perform(post("/owner/order/{orderId}/accept", orderId).with(csrf()))
+            mockMvc.perform(post("/store/owner/order/{orderId}/accept", orderId).with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(StoreErrorCode.STORE_NOT_FOUND.getCode()));
 

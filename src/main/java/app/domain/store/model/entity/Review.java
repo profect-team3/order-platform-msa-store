@@ -3,7 +3,7 @@ package app.domain.store.model.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import app.global.entity.BaseEntity;
+import app.commonUtil.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

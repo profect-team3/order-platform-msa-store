@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.PagedResponse;
+import app.commonUtil.apiPayload.code.status.ErrorStatus;
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.store.client.ReviewClient;
 import app.domain.store.client.UserClient;
 import app.domain.store.model.StoreQueryRepository;
@@ -19,10 +23,6 @@ import app.domain.store.model.entity.Store;
 import app.domain.store.repository.StoreRepository;
 import app.domain.store.status.StoreAcceptStatus;
 import app.domain.store.status.StoreErrorCode;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.PagedResponse;
-import app.global.apiPayload.code.status.ErrorStatus;
-import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

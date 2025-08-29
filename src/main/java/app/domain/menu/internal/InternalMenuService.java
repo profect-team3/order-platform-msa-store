@@ -1,6 +1,7 @@
 package app.domain.menu.internal;
 
 
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.dto.response.MenuInfoResponse;
 import app.domain.menu.model.entity.Menu;
@@ -8,7 +9,6 @@ import app.domain.menu.model.entity.Stock;
 import app.domain.menu.model.repository.MenuRepository;
 import app.domain.menu.model.repository.StockRepository;
 import app.domain.menu.status.StoreMenuErrorCode;
-import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

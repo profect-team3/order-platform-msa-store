@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import app.commonUtil.apiPayload.code.status.ErrorStatus;
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.store.repository.StoreRepository;
-import app.global.apiPayload.code.status.ErrorStatus;
-import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 
 @Service

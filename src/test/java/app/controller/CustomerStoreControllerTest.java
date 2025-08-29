@@ -21,13 +21,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import app.commonUtil.apiPayload.PagedResponse;
+import app.commonUtil.apiPayload.code.status.ErrorStatus;
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.store.controller.CustomerStoreController;
 import app.domain.store.model.dto.response.GetCustomerStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.service.CustomerStoreService;
-import app.global.apiPayload.PagedResponse;
-import app.global.apiPayload.code.status.ErrorStatus;
-import app.global.apiPayload.exception.GeneralException;
+
 
 
 @WebMvcTest(CustomerStoreController.class)

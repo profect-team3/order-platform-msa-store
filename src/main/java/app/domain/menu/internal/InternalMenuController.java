@@ -1,9 +1,9 @@
 package app.domain.menu.internal;
 
+import app.commonUtil.apiPayload.ApiResponse;
 import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.model.dto.response.MenuInfoResponse;
 import app.domain.menu.status.StoreMenuSuccessStatus;
-import app.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.PagedResponse;
 import app.domain.store.service.ManagerService;
 import app.domain.store.model.dto.response.GetStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.status.ManagerSuccessStatus;
 import app.domain.store.status.StoreAcceptStatus;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

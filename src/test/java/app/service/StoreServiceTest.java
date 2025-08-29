@@ -17,7 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
+import app.commonUtil.apiPayload.ApiResponse;
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.menu.model.dto.response.MenuListResponse;
 import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.entity.Menu;
@@ -35,8 +36,6 @@ import app.domain.store.model.entity.Store;
 import app.domain.store.repository.RegionRepository;
 import app.domain.store.repository.StoreRepository;
 import app.domain.store.status.StoreAcceptStatus;
-import app.global.apiPayload.ApiResponse;
-import app.global.apiPayload.exception.GeneralException;
 import app.domain.store.status.StoreErrorCode;
 
 @ExtendWith(MockitoExtension.class)

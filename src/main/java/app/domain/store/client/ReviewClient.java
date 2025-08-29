@@ -1,7 +1,7 @@
 package app.domain.store.client;
 
+import app.commonUtil.apiPayload.ApiResponse;
 import app.domain.store.model.dto.response.GetReviewResponse;
-import app.global.apiPayload.ApiResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

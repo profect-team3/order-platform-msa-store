@@ -1,5 +1,6 @@
 package app.service;
 
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.batch.config.DiscordListener;
 import app.domain.menu.internal.StockRetryService;
 import app.domain.menu.model.dto.request.StockRequest;
@@ -13,7 +14,6 @@ import app.domain.store.model.entity.Region;
 import app.domain.store.model.entity.Store;
 import app.domain.store.repository.RegionRepository;
 import app.domain.store.repository.StoreRepository;
-import app.global.apiPayload.exception.GeneralException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

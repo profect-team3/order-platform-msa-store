@@ -27,7 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import app.commonSecurity.TokenPrincipalParser;
+import app.commonUtil.apiPayload.exception.GeneralException;
+import app.commonUtil.security.TokenPrincipalParser;
 import app.domain.menu.model.dto.response.MenuListResponse;
 import app.domain.store.controller.StoreController;
 import app.domain.store.model.dto.request.StoreApproveRequest;
@@ -42,7 +43,6 @@ import app.domain.store.repository.StoreRepository;
 import app.domain.store.service.StoreService;
 import app.domain.store.status.StoreErrorCode;
 import app.domain.store.status.StoreSuccessStatus;
-import app.global.apiPayload.exception.GeneralException;
 
 @WebMvcTest(StoreController.class)
 @DisplayName("StoreController 테스트")

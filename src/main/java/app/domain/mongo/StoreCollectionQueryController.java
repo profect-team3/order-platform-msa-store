@@ -1,9 +1,9 @@
 package app.domain.mongo;
 
+import app.commonUtil.apiPayload.ApiResponse;
 import app.domain.mongo.model.entity.StoreCollection;
 import app.domain.mongo.status.MongoStoreMenuErrorCode;
 import app.domain.mongo.status.MongoStoreMenuSuccessCode;
-import app.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

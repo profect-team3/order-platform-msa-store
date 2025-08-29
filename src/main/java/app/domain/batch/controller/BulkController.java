@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/jobs")
+@RequestMapping("/store/jobs")
 @RequiredArgsConstructor
 public class BulkController {
 

@@ -13,8 +13,10 @@ COPY src ./src
 COPY libs ./libs
 
 RUN ./gradlew bootJar -x test
+
 RUN sudo apt update && sudo apt install wget
 RUN wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+
 
 FROM eclipse-temurin:17-jre-jammy
 
@@ -25,4 +27,3 @@ COPY --from=builder /workspace/build/libs/*.jar /app/application.jar
 EXPOSE 8082
 
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "/app/application.jar"]
-

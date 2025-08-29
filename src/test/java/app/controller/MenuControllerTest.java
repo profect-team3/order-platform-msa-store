@@ -82,7 +82,7 @@ public class MenuControllerTest {
             when(customerMenuService.getMenusByStoreId(any(UUID.class), any(Pageable.class))).thenReturn(mockResponse);
 
             // when & then
-            mockMvc.perform(get("/menu/{storeId}", TEST_STORE_ID)
+            mockMvc.perform(get("/store/menu/{storeId}", TEST_STORE_ID)
                     .param("page", "0")
                     .param("size", "10"))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ public class MenuControllerTest {
             when(storeMenuService.createMenu(any(MenuCreateRequest.class), anyLong())).thenReturn(mockResponse);
 
             // when & then
-            mockMvc.perform(post("/owner/menu")
+            mockMvc.perform(post("/store/owner/menu")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -128,7 +128,7 @@ public class MenuControllerTest {
             when(storeMenuService.updateMenu(any(MenuUpdateRequest.class), anyLong())).thenReturn(mockResponse);
 
             // when & then
-            mockMvc.perform(put("/owner/menu")
+            mockMvc.perform(put("/store/owner/menu")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -149,7 +149,7 @@ public class MenuControllerTest {
             when(storeMenuService.deleteMenu(any(), anyLong())).thenReturn(mockResponse);
 
             // when & then
-            mockMvc.perform(delete("/owner/menu/delete")
+            mockMvc.perform(delete("/store/owner/menu/delete")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -170,7 +170,7 @@ public class MenuControllerTest {
             when(storeMenuService.updateMenuVisibility(any(UUID.class), anyBoolean(), anyLong())).thenReturn(mockResponse);
 
             // when & then
-            mockMvc.perform(put("/owner/menu/visible")
+            mockMvc.perform(put("/store/owner/menu/visible")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))

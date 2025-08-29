@@ -55,7 +55,7 @@ public class BulkControllerTest {
     void startBatchJob_Success() throws Exception {
         when(jobLauncher.run(any(Job.class), any(JobParameters.class))).thenReturn(jobExecution);
 
-        mockMvc.perform(post("/jobs/store-sync")
+        mockMvc.perform(post("/store/jobs/store-sync")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -70,7 +70,7 @@ public class BulkControllerTest {
         when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
             .thenThrow(new JobExecutionAlreadyRunningException("Job is already running"));
 
-        mockMvc.perform(post("/jobs/store-sync")
+        mockMvc.perform(post("/store/jobs/store-sync")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isConflict())
@@ -84,7 +84,7 @@ public class BulkControllerTest {
         when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
             .thenThrow(new JobParametersInvalidException("Invalid job parameters"));
 
-        mockMvc.perform(post("/jobs/store-sync")
+        mockMvc.perform(post("/store/jobs/store-sync")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isInternalServerError())
@@ -98,7 +98,7 @@ public class BulkControllerTest {
         when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
             .thenThrow(new RuntimeException("Unexpected error"));
 
-        mockMvc.perform(post("/jobs/store-sync")
+        mockMvc.perform(post("/store/jobs/store-sync")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isInternalServerError())

@@ -12,11 +12,13 @@ import app.domain.store.status.StoreErrorCode;
 import app.domain.store.status.StoreSuccessStatus;
 import app.global.apiPayload.ApiResponse;
 import app.global.apiPayload.exception.GeneralException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/region")
+@RequestMapping("/store/manager/region")
+@Tag(name = "지역 추가 API", description = "관리자의 사용자 관리 API")
 public class RegionController {
 
 	private final RegionService regionService;

@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mongo/stores")
+@RequestMapping("/store/mongo")
 @Tag(name = "MongoDB Store Query API", description = "MongoDB 기반 가게 검색 API")
 public class StoreCollectionQueryController {
 

@@ -78,7 +78,7 @@ public class StoreCollectionQueryControllerTest {
             StoreCollection testStore = createTestStore(UUID.randomUUID().toString(), "Test Store");
             when(storeCollectionQueryService.searchStores(anyString())).thenReturn(Collections.singletonList(testStore));
 
-            mockMvc.perform(get("/mongo/stores/search").param("keyword", keyword))
+            mockMvc.perform(get("/store/mongo/search").param("keyword", keyword))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.code").value(MongoStoreMenuSuccessCode.STORE_GET_SUCCESS.getCode()))
@@ -92,7 +92,7 @@ public class StoreCollectionQueryControllerTest {
             String keyword = "NonExistent";
             when(storeCollectionQueryService.searchStores(anyString())).thenReturn(Collections.emptyList());
 
-            mockMvc.perform(get("/mongo/stores/search").param("keyword", keyword))
+            mockMvc.perform(get("/store/mongo/search").param("keyword", keyword))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(false));
         }
@@ -110,7 +110,7 @@ public class StoreCollectionQueryControllerTest {
             StoreCollection testStore = createTestStore(storeKey, "Test Store");
             when(storeCollectionQueryService.findStoreByStoreKey(anyString())).thenReturn(Optional.of(testStore));
 
-            mockMvc.perform(get("/mongo/stores/{storeKey}", storeKey))
+            mockMvc.perform(get("/store/mongo/{storeKey}", storeKey))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.storeKey").value(storeKey))
                 .andExpect(jsonPath("$.result.menus[0].name").value("Test Menu"));
@@ -123,7 +123,7 @@ public class StoreCollectionQueryControllerTest {
             String storeKey = "non-existent-key";
             when(storeCollectionQueryService.findStoreByStoreKey(anyString())).thenReturn(Optional.empty());
 
-            mockMvc.perform(get("/mongo/stores/{storeKey}", storeKey))
+            mockMvc.perform(get("/store/mongo/{storeKey}", storeKey))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(false));
         }
@@ -141,7 +141,7 @@ public class StoreCollectionQueryControllerTest {
             Page<StoreCollection> pagedResponse = new PageImpl<>(Collections.singletonList(testStore));
             when(storeCollectionQueryService.findAllStores(any(Pageable.class))).thenReturn(pagedResponse);
 
-            mockMvc.perform(get("/mongo/stores").param("page", "0").param("size", "10"))
+            mockMvc.perform(get("/store/mongo").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.content[0].storeName").value("Test Store"));
         }
@@ -153,7 +153,7 @@ public class StoreCollectionQueryControllerTest {
             Page<StoreCollection> pagedResponse = new PageImpl<>(Collections.emptyList());
             when(storeCollectionQueryService.findAllStores(any(Pageable.class))).thenReturn(pagedResponse);
 
-            mockMvc.perform(get("/mongo/stores").param("page", "0").param("size", "10"))
+            mockMvc.perform(get("/store/mongo").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(false));
         }
@@ -171,7 +171,7 @@ public class StoreCollectionQueryControllerTest {
             StoreCollection testStore = createTestStore(UUID.randomUUID().toString(), "Test Store");
             when(storeCollectionQueryService.searchStoresByName(keyword)).thenReturn(Collections.singletonList(testStore));
 
-            mockMvc.perform(get("/mongo/stores/search-by-name").param("keyword", keyword))
+            mockMvc.perform(get("/store/mongo/search-by-name").param("keyword", keyword))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result[0].storeName").value("Test Store"));
         }
@@ -189,7 +189,7 @@ public class StoreCollectionQueryControllerTest {
             StoreCollection testStore = createTestStore(UUID.randomUUID().toString(), "Test Chicken Store");
             when(storeCollectionQueryService.searchStoresByCategory(category)).thenReturn(Collections.singletonList(testStore));
 
-            mockMvc.perform(get("/mongo/stores/search-by-category").param("category", category))
+            mockMvc.perform(get("/store/mongo/search-by-category").param("category", category))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result[0].categoryKeys[0]").value(category));
         }
@@ -207,7 +207,7 @@ public class StoreCollectionQueryControllerTest {
             StoreCollection testStore = createTestStore(UUID.randomUUID().toString(), "Test Store");
             when(storeCollectionQueryService.searchStoresByMenuName(keyword)).thenReturn(Collections.singletonList(testStore));
 
-            mockMvc.perform(get("/mongo/stores/search-by-menu").param("keyword", keyword))
+            mockMvc.perform(get("/store/mongo/search-by-menu").param("keyword", keyword))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result[0].menus[0].name").value(keyword));
         }
@@ -226,7 +226,7 @@ public class StoreCollectionQueryControllerTest {
             when(storeCollectionQueryService.filterStoresByMenuNameAndReturnFilteredMenus(keyword))
                 .thenReturn(Collections.singletonList(testStore));
 
-            mockMvc.perform(get("/mongo/stores/filter-by-menu").param("keyword", keyword))
+            mockMvc.perform(get("/store/mongo/filter-by-menu").param("keyword", keyword))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result[0].menus[0].name").value(keyword));
         }

@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Store", description = "가게, 가게 메뉴 관리")
 @RestController
-@RequestMapping("/owner")
+@RequestMapping("/store/owner")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('OWNER')")
 public class StoreMenuController {

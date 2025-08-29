@@ -15,6 +15,9 @@ docker run --name store \
     -e DB_PASSWORD=password \
     -e OAUTH_JWKS_URI=http://host.docker.internal:8083/oauth/jwks \
     -e AUTH_INTERNAL_AUDIENCE=internal-services \
+    -e MONGODB_HOST=mongodb \
+    -e MONGO_INITDB_ROOT_USERNAME=root \
+    -e MONGO_INITDB_ROOT_PASSWORD=profectcloud \
     -d order-platform-msa-store
 
 

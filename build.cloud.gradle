@@ -4,7 +4,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-
 group = 'goorm.delivery'
 version = '0.0.1-SNAPSHOT'
 
@@ -21,47 +20,43 @@ configurations {
 }
 
 dependencies {
-    // Spring Boot 기본
-    implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation "org.springframework.boot:spring-boot-starter-validation"
-    implementation "org.springframework.boot:spring-boot-starter-aop"      // @PreAuthorize 등 AOP 사용 시 유용
+    // core
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    // Persistence / DB
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation "org.springframework.boot:spring-boot-starter-batch"
-    implementation "org.springframework.boot:spring-boot-starter-data-mongodb"
-        // DB
-    runtimeOnly   "org.postgresql:postgresql"
+    // db
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-    // Security / OAuth2
+    // security
+    implementation files('libs/msa-common-util-1.0.2-plain.jar')
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation files('libs/msa-common-util-1.0.1-plain.jar')
 
-    // Swagger
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0"
+    // docs
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
-    // QueryDSL (Jakarta)
-    implementation       "com.querydsl:querydsl-jpa:5.1.0:jakarta"
-    annotationProcessor  "com.querydsl:querydsl-apt:5.1.0:jakarta"
-    annotationProcessor  "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor  "jakarta.persistence:jakarta.persistence-api"
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-    // Lombok
-    compileOnly         "org.projectlombok:lombok"
-    annotationProcessor "org.projectlombok:lombok"
-
-    // Retry
-    implementation "org.springframework.retry:spring-retry"
-
-    // Test
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.springframework.security:spring-security-test"
-    testImplementation "org.springframework.batch:spring-batch-test"
-    testImplementation "com.h2database:h2"
-    //Health Check
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    testImplementation 'com.h2database:h2'
 }
+
 clean {
     delete file('src/main/generated')
 }

@@ -25,7 +25,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import app.commonSecurity.TokenPrincipalParser;
+import app.commonUtil.apiPayload.PagedResponse;
+import app.commonUtil.security.TokenPrincipalParser;
 import app.domain.menu.controller.CustomerMenuController;
 import app.domain.menu.controller.StoreMenuController;
 import app.domain.menu.model.dto.request.MenuCreateRequest;
@@ -38,7 +39,6 @@ import app.domain.menu.model.dto.response.MenuDeleteResponse;
 import app.domain.menu.model.dto.response.MenuUpdateResponse;
 import app.domain.menu.service.CustomerMenuService;
 import app.domain.menu.service.StoreMenuService;
-import app.global.apiPayload.PagedResponse;
 
 @WebMvcTest({CustomerMenuController.class, StoreMenuController.class})
 @DisplayName("Menu Controllers Test")

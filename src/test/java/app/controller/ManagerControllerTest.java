@@ -19,12 +19,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import app.commonUtil.apiPayload.PagedResponse;
 import app.domain.store.controller.ManagerController;
 import app.domain.store.model.dto.response.GetStoreDetailResponse;
 import app.domain.store.model.dto.response.GetStoreListResponse;
 import app.domain.store.service.ManagerService;
 import app.domain.store.status.StoreAcceptStatus;
-import app.global.apiPayload.PagedResponse;
 
 @WebMvcTest(ManagerController.class)
 @DisplayName("ManagerController Test")

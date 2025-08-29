@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import app.commonUtil.entity.BaseEntity;
 import app.domain.menu.model.entity.Category;
 import app.domain.store.status.StoreAcceptStatus;
-import app.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

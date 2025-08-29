@@ -8,9 +8,9 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import app.commonUtil.apiPayload.exception.GeneralException;
 import app.domain.menu.model.dto.request.StockRequest;
 import app.domain.menu.status.StoreMenuErrorCode;
-import app.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

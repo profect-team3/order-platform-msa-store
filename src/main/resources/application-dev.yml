@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${OAUTH_JWKS_URI:http://localhost:8083/oauth/jwks}
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: 27017
+      database: ${MONGO_NAME:store-db}
+      username: ${MONGO_INITDB_ROOT_USERNAME:root}
+      password: ${MONGO_INITDB_ROOT_PASSWORD:profectcloud}
+      authentication-database: admin
+
+jwt:
+  audience:  ${AUTH_INTERNAL_AUDIENCE:internal-services}
+
+discord:
+  webhook:
+    url: ${DISCORD_URL}

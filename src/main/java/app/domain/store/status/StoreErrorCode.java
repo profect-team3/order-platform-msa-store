@@ -32,7 +32,10 @@ public enum StoreErrorCode implements BaseCode {
 
 	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE017", "해당 주문을 찾을 수 없습니다."),
 	NOT_STORE_OWNER(HttpStatus.FORBIDDEN, "STORE018", "해당 가게의 점주가 아닙니다."),
-	INVALID_STORE_STATUS(HttpStatus.NOT_FOUND,"STORE019","이미 처리된 상태명 입니다.");
+	INVALID_STORE_STATUS(HttpStatus.NOT_FOUND,"STORE019","이미 처리된 상태명 입니다."),
+	CART_ITEM_PARSE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"STORE020","장바구니 아이템 파싱에 실패했습니다."),
+	CART_REDIS_LOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"STORE021","장바구니 조회에 실패했습니다.");
+
 	private final HttpStatus httpStatus;
 	private final String code;
 	private final String message;

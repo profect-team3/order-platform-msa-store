@@ -3,8 +3,6 @@ name: ECR Push - store
 on:
   push:
     branches: ["stage", "dev"]
-  pull_request:
-    branches: ["stage", "dev"]
 
 jobs:
   build-and-push:
@@ -27,7 +25,7 @@ jobs:
 
       - name: Build & Push store service
         run: |
-          docker build -f Dockerfile -t order-test-ecr-store:latest .
-          docker tag order-test-ecr-store:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-test-ecr-store:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-test-ecr-store:latest
+          docker build -f Dockerfile -t order-store:latest .
+          docker tag order-store:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-store:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/order-store:latest
 

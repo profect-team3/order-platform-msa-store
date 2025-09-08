@@ -36,7 +36,9 @@ public enum StoreErrorCode implements BaseCode {
 	CART_ITEM_PARSE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"STORE020","장바구니 아이템 파싱에 실패했습니다."),
 	CART_REDIS_LOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"STORE021","장바구니 조회에 실패했습니다."),
 	CART_NOT_FOUND(HttpStatus.NOT_FOUND,"STORE022","장바구니가 존재하지 않습니다."),
-	ORDER_DIFFERENT_STORE(HttpStatus.BAD_REQUEST,"STORE023","장바구니에 두 매장의 메뉴가 담겨있습니다");
+	ORDER_DIFFERENT_STORE(HttpStatus.BAD_REQUEST,"STORE023","장바구니에 두 매장의 메뉴가 담겨있습니다"),
+	KAFKA_MESSAGE_PARSE_FAILED(HttpStatus.BAD_REQUEST, "STORE024", "카프카 메시지 파싱에 실패했습니다."),
+	INVALID_TOTAL_PRICE(HttpStatus.BAD_REQUEST, "STORE025", "주문 총액이 일치하지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

@@ -6,13 +6,11 @@ import app.domain.menu.model.repository.MenuRepository;
 import app.domain.menu.status.StoreMenuErrorCode;
 import app.domain.store.repository.StoreRepository;
 import app.domain.store.status.StoreErrorCode;
-import app.domain.store.kafka.dto.OrderCreateRequestEvent;
-import app.domain.store.kafka.dto.RedisCartItem;
-import app.domain.store.kafka.dto.MenuInfoResponse;
-import app.domain.store.kafka.dto.OrderValidResponse;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,26 +35,31 @@ public class OrderValidConsumer {
 
 	@KafkaListener(topics="order-valid-request",groupId = "order-valid-consumer")
 	public void consume(String message){
-		OrderCreateRequestEvent event;
+		Map<String, Object> event;
 		try {
-			event = objectMapper.readValue(message, OrderCreateRequestEvent.class);
+			event = objectMapper.readValue(message, Map.class);
 		} catch (JsonProcessingException e) {
-			OrderValidResponse response = OrderValidResponse.builder()
-				.orderId(null)
-				.eventType("fail")
-				.build();
-			orderValidProducer.sendOrderValidResult(response);
+			Map<String, Object> headers = new HashMap<>();
+			headers.put("eventType", "fail");
+			headers.put("orderId", null);
+			Map<String, Object> errorPayload = new HashMap<>();
+			errorPayload.put("errorMessage", "Parse error");
+			orderValidProducer.sendOrderValidResult(headers, errorPayload);
 			return;
 		}
 
 		try {
-			List<RedisCartItem> items = getCartFromRedis(event.getUserId());
+			Long userId = ((Number) event.get("userId")).longValue();
+			UUID orderId = UUID.fromString((String) event.get("orderId"));
+			Long totalPrice = ((Number) event.get("totalPrice")).longValue();
+
+			List<RedisCartItem> items = getCartFromRedis(userId);
 
 			if(items.isEmpty()){
 				throw new GeneralException(StoreErrorCode.CART_NOT_FOUND);
 			}
 
-			if(!storeRepository.existsByStoreId(event.getStoreId())){
+			if(!storeRepository.existsByStoreId(items.get(0).getStoreId())){
 				throw new GeneralException(StoreErrorCode.STORE_NOT_FOUND);
 			}
 
@@ -76,35 +79,43 @@ public class OrderValidConsumer {
 				.mapToLong(item -> menuMap.get(item.getMenuId()).getPrice() * item.getQuantity())
 				.sum();
 
-			if (calculatedTotalPrice != event.getTotalPrice()) {
+			if (calculatedTotalPrice != totalPrice) {
 				throw new GeneralException(StoreErrorCode.INVALID_TOTAL_PRICE);
 			}
 			// --- End Validation ---
 
 			// --- Success Case ---
-			Map<UUID, MenuInfoResponse> menuInfos = items.stream()
-				.collect(Collectors.toMap(
-					RedisCartItem::getMenuId,
-					item -> {
-						Menu menu = menuMap.get(item.getMenuId());
-						return new MenuInfoResponse(menu.getName(), menu.getPrice(), item.getQuantity());
-					}
-				));
+			List<Map<String, Object>> menuList = items.stream()
+				.map(item -> {
+					Menu menu = menuMap.get(item.getMenuId());
+					Map<String, Object> menuInfo = new HashMap<>();
+					menuInfo.put("menuId", menu.getMenuId());
+					menuInfo.put("menuName", menu.getName());
+					menuInfo.put("price", menu.getPrice());
+					menuInfo.put("quantity", item.getQuantity());
+					return menuInfo;
+				})
+				.collect(Collectors.toList());
 
-			OrderValidResponse response = OrderValidResponse.builder()
-				.orderId(event.getOrderId())
-				.eventType("success")
-				.menuInfos(menuInfos)
-				.build();
-			orderValidProducer.sendOrderValidResult(response);
+			Map<String, Object> headers = new HashMap<>();
+			headers.put("eventType", "success");
+			headers.put("orderId", orderId);
+			orderValidProducer.sendOrderValidResult(headers, menuList);
 
 		} catch (GeneralException e) {
 			// --- Failure Case ---
-			OrderValidResponse response = OrderValidResponse.builder()
-				.orderId(event.getOrderId())
-				.eventType("fail")
-				.build();
-			orderValidProducer.sendOrderValidResult(response);
+			UUID orderId = null;
+			try {
+				orderId = UUID.fromString((String) event.get("orderId"));
+			} catch (Exception ex) {
+				// orderId parsing failed, keep null
+			}
+			Map<String, Object> headers = new HashMap<>();
+			headers.put("eventType", "fail");
+			headers.put("orderId", orderId);
+			Map<String, Object> errorPayload = new HashMap<>();
+			errorPayload.put("errorMessage", e.getMessage());
+			orderValidProducer.sendOrderValidResult(headers, errorPayload);
 		}
 	}
 

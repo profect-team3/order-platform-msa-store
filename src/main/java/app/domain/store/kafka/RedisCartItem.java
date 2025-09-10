@@ -1,4 +1,4 @@
-package app.domain.store.kafka.dto;
+package app.domain.store.kafka;
 
 import java.util.UUID;
 

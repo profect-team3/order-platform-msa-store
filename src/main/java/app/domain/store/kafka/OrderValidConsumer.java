@@ -51,7 +51,6 @@ public class OrderValidConsumer {
 
 		try {
 			Long userId = ((Number) event.get("userId")).longValue();
-			UUID orderId = headerOrderId != null ? UUID.fromString(headerOrderId) : UUID.fromString((String) event.get("orderId"));
 			Long totalPrice = ((Number) event.get("totalPrice")).longValue();
 
 			List<RedisCartItem> items = getCartFromRedis(userId);
@@ -100,20 +99,14 @@ public class OrderValidConsumer {
 
 			Map<String, Object> headers = new HashMap<>();
 			headers.put("eventType", "success");
-			headers.put("orderId", orderId);
+			headers.put("orderId", headerOrderId);
 			orderValidProducer.sendOrderValidResult(headers, menuList);
 
 		} catch (GeneralException e) {
 			// --- Failure Case ---
-			UUID orderId = null;
-			try {
-				orderId = headerOrderId != null ? UUID.fromString(headerOrderId) : UUID.fromString((String) event.get("orderId"));
-			} catch (Exception ex) {
-				// orderId parsing failed, keep null
-			}
 			Map<String, Object> headers = new HashMap<>();
 			headers.put("eventType", "fail");
-			headers.put("orderId", orderId);
+			headers.put("orderId", headerOrderId);
 			Map<String, Object> errorPayload = new HashMap<>();
 			errorPayload.put("errorMessage", e.getErrorReason().getMessage());
 			orderValidProducer.sendOrderValidResult(headers, errorPayload);

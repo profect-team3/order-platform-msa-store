@@ -114,7 +114,7 @@ public class OrderValidConsumer {
 			headers.put("eventType", "fail");
 			headers.put("orderId", orderId);
 			Map<String, Object> errorPayload = new HashMap<>();
-			errorPayload.put("errorMessage", e.getMessage());
+			errorPayload.put("errorMessage", e.getErrorReason().getMessage());
 			orderValidProducer.sendOrderValidResult(headers, errorPayload);
 		}
 	}

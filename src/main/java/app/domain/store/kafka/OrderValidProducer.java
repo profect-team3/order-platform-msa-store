@@ -28,7 +28,7 @@ public class OrderValidProducer {
 				.setHeader("orderId", headers.get("orderId"))
 				.build();
 			
-			kafkaTemplate.send("order-valid-result", message.getPayload());
+			kafkaTemplate.send("order.valid.result", message.getPayload());
 		} catch (JsonProcessingException e) {
 			log.error("Could not serialize payload for orderId: {}", headers.get("orderId"), e);
 		}

@@ -33,7 +33,7 @@ public class OrderValidConsumer {
 	private final MenuRepository menuRepository;
 	private final OrderValidProducer orderValidProducer;
 
-	@KafkaListener(topics="order-valid-request",groupId = "order-valid-consumer")
+	@KafkaListener(topics="order.valid.request",groupId = "order.valid.consumer")
 	public void consume(String message){
 		Map<String, Object> event;
 		try {

@@ -18,9 +18,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
-
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -34,14 +35,14 @@ public class OrderValidConsumer {
 	private final OrderValidProducer orderValidProducer;
 
 	@KafkaListener(topics="order.valid.request",groupId = "order.valid.consumer")
-	public void consume(String message){
+	public void consume(String message, @Header(value = "orderId", required = false) String headerOrderId){
 		Map<String, Object> event;
 		try {
 			event = objectMapper.readValue(message, Map.class);
 		} catch (JsonProcessingException e) {
 			Map<String, Object> headers = new HashMap<>();
 			headers.put("eventType", "fail");
-			headers.put("orderId", null);
+			headers.put("orderId", headerOrderId);
 			Map<String, Object> errorPayload = new HashMap<>();
 			errorPayload.put("errorMessage", "Parse error");
 			orderValidProducer.sendOrderValidResult(headers, errorPayload);
@@ -50,7 +51,7 @@ public class OrderValidConsumer {
 
 		try {
 			Long userId = ((Number) event.get("userId")).longValue();
-			UUID orderId = UUID.fromString((String) event.get("orderId"));
+			UUID orderId = headerOrderId != null ? UUID.fromString(headerOrderId) : UUID.fromString((String) event.get("orderId"));
 			Long totalPrice = ((Number) event.get("totalPrice")).longValue();
 
 			List<RedisCartItem> items = getCartFromRedis(userId);
@@ -106,7 +107,7 @@ public class OrderValidConsumer {
 			// --- Failure Case ---
 			UUID orderId = null;
 			try {
-				orderId = UUID.fromString((String) event.get("orderId"));
+				orderId = headerOrderId != null ? UUID.fromString(headerOrderId) : UUID.fromString((String) event.get("orderId"));
 			} catch (Exception ex) {
 				// orderId parsing failed, keep null
 			}

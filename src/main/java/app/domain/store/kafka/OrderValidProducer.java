@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -22,13 +21,13 @@ public class OrderValidProducer {
 		try {
 			String payloadJson = objectMapper.writeValueAsString(payload);
 			
-			Message<String> message = MessageBuilder
-				.withPayload(payloadJson)
-				.setHeader("eventType", headers.get("eventType"))
-				.setHeader("orderId", headers.get("orderId"))
-				.build();
+			ProducerRecord<String, String> record = new ProducerRecord<>("order.valid.result", payloadJson);
+			record.headers().add(new RecordHeader("eventType", headers.get("eventType").toString().getBytes()));
+			if (headers.get("orderId") != null) {
+				record.headers().add(new RecordHeader("orderId", headers.get("orderId").toString().getBytes()));
+			}
 			
-			kafkaTemplate.send("order.valid.result", message.getPayload());
+			kafkaTemplate.send(record);
 		} catch (JsonProcessingException e) {
 			log.error("Could not serialize payload for orderId: {}", headers.get("orderId"), e);
 		}

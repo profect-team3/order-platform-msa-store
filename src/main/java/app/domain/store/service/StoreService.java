@@ -20,6 +20,7 @@ import app.domain.menu.model.entity.Category;
 import app.domain.menu.model.entity.Menu;
 import app.domain.menu.model.repository.CategoryRepository;
 import app.domain.menu.model.repository.MenuRepository;
+import app.domain.store.kafka.OrderApproveProduce;
 import app.domain.store.model.dto.response.GetReviewResponse;
 import app.domain.store.model.dto.request.StoreApproveRequest;
 import app.domain.store.model.dto.request.StoreInfoUpdateRequest;
@@ -49,6 +50,7 @@ public class StoreService {
 	private final OrderClient orderClient;
 	private final ReviewClient reviewClient;
 	private final UserClient userClient;
+	private final OrderApproveProduce orderApproveProduce;
 
 	@Transactional
 	public StoreApproveResponse createStore(StoreApproveRequest request, Long userId) {
@@ -228,13 +230,7 @@ public class StoreService {
 		if (!store.getUserId().equals(userId)) {
 			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
 		}
-		ApiResponse<String> updateOrderStatusResponse;
-		try{
-			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, "ACCEPTED");
-		} catch (HttpClientErrorException|HttpServerErrorException e){
-			log.error("Order Service Error: {}", e.getResponseBodyAsString());
-			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
-		}
+		orderApproveProduce.sendOrderApproveResult(orderId,"success");
 	}
 
 	@Transactional
@@ -254,13 +250,8 @@ public class StoreService {
 		if (!store.getUserId().equals(userId)) {
 			throw new GeneralException(StoreErrorCode.NOT_STORE_OWNER);
 		}
-		ApiResponse<String> updateOrderStatusResponse;
-		try{
-			updateOrderStatusResponse=orderClient.updateOrderStatus(orderId, "REJECTED");
-		} catch (HttpClientErrorException|HttpServerErrorException e){
-			log.error("Order Service Error: {}", e.getResponseBodyAsString());
-			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
-		}
+		orderApproveProduce.sendOrderApproveResult(orderId,"rejected");
+
 	}
 
 

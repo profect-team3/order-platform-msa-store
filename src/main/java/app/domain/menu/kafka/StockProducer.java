@@ -13,9 +13,11 @@ public class StockProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendStockResult(String eventType) {
-        ProducerRecord<String, Object> record = new ProducerRecord<>("stock.result", "");
+    public void sendStockResult(String headerOrderId,String eventType,String value) {
+        ProducerRecord<String, Object> record = new ProducerRecord<>("stock.result", value);
         record.headers().add("eventType", eventType.getBytes());
+        record.headers().add("orderId",headerOrderId.getBytes());
+
         
         kafkaTemplate.send(record);
         log.info("Sent stock result with eventType: {}", eventType);

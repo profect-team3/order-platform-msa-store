@@ -2,6 +2,7 @@ package app.domain.menu.kafka;
 
 import app.domain.menu.model.entity.Stock;
 import app.domain.menu.model.repository.StockRepository;
+import app.domain.menu.status.StoreMenuErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -46,7 +47,7 @@ public class StockService {
         """;
 
     @Transactional
-    public void processStockRequest(List<Map<String, Object>> stockRequests) {
+    public void processStockRequest(List<Map<String, Object>> stockRequests,String headerOrderId) {
         try {
             List<String> keys = stockRequests.stream()
                     .map(req -> "stock:" + req.get("menuId"))
@@ -61,13 +62,13 @@ public class StockService {
 
             if (result != null && result == 1L) {
                 updateDatabaseStock(stockRequests);
-                stockProducer.sendStockResult("success");
+                stockProducer.sendStockResult(headerOrderId,"success","");
             } else {
-                stockProducer.sendStockResult("fail");
+                stockProducer.sendStockResult(headerOrderId,"fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage());
             }
         } catch (Exception e) {
             log.error("Error processing stock request", e);
-            stockProducer.sendStockResult("fail");
+            stockProducer.sendStockResult(headerOrderId,"fail",e.getMessage());
         }
     }
 

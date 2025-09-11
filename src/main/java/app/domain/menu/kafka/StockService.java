@@ -5,6 +5,7 @@ import app.domain.menu.model.repository.StockRepository;
 import app.domain.menu.status.StoreMenuErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -26,7 +27,7 @@ public class StockService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final StockRepository stockRepository;
-    private final StockProducer stockProducer;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static final String LUA_SCRIPT = """
         local keys = KEYS
@@ -62,13 +63,13 @@ public class StockService {
 
             if (result != null && result == 1L) {
                 updateDatabaseStock(stockRequests);
-                stockProducer.sendStockResult(headerOrderId,"success","");
+                eventPublisher.publishEvent(new StockResultEvent(headerOrderId, "success", ""));
             } else {
-                stockProducer.sendStockResult(headerOrderId,"fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage());
+                eventPublisher.publishEvent(new StockResultEvent(headerOrderId, "fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage()));
             }
         } catch (Exception e) {
             log.error("Error processing stock request", e);
-            stockProducer.sendStockResult(headerOrderId,"fail",e.getMessage());
+            eventPublisher.publishEvent(new StockResultEvent(headerOrderId, "fail", e.getMessage()));
         }
     }
 

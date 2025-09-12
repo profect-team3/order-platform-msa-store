@@ -65,7 +65,11 @@ public class StockService {
                 updateDatabaseStock(stockRequests);
                 eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "success", ""));
             } else {
-                eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage()));
+                if (processStockFromDatabase(stockRequests)) {
+                    eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "success", ""));
+                } else {
+                    eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage()));
+                }
             }
         } catch (Exception e) {
             log.error("Error processing stock request", e);
@@ -95,6 +99,42 @@ public class StockService {
                 stock.setStock(stock.getStock() - quantity);
             }
         });
+    }
+
+    @Transactional
+    public boolean processStockFromDatabase(List<Map<String, Object>> stockRequests) {
+        try {
+            List<UUID> menuIds = stockRequests.stream()
+                    .map(req -> UUID.fromString(req.get("menuId").toString()))
+                    .collect(Collectors.toList());
+
+            Map<UUID, Stock> stockMap = stockRepository.findByMenuMenuIdIn(menuIds).stream()
+                    .collect(Collectors.toMap(stock -> stock.getMenu().getMenuId(), stock -> stock));
+
+            for (Map<String, Object> req : stockRequests) {
+                UUID menuId = UUID.fromString(req.get("menuId").toString());
+                Integer quantity = Integer.valueOf(req.get("quantity").toString());
+                Stock stock = stockMap.get(menuId);
+                
+                if (stock == null || stock.getStock() < quantity) {
+                    return false;
+                }
+            }
+
+            stockRequests.forEach(req -> {
+                UUID menuId = UUID.fromString(req.get("menuId").toString());
+                Integer quantity = Integer.valueOf(req.get("quantity").toString());
+                Stock stock = stockMap.get(menuId);
+                stock.setStock(stock.getStock() - quantity);
+                
+                redisTemplate.opsForValue().set("stock:" + menuId, String.valueOf(stock.getStock()));
+            });
+            
+            return true;
+        } catch (Exception e) {
+            log.error("DB 재고 처리 실패", e);
+            return false;
+        }
     }
 
     @Recover

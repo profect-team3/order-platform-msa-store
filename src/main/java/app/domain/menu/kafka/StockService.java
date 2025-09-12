@@ -63,13 +63,13 @@ public class StockService {
 
             if (result != null && result == 1L) {
                 updateDatabaseStock(stockRequests);
-                eventPublisher.publishEvent(new StockResultEvent(headerOrderId, "success", ""));
+                eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "success", ""));
             } else {
-                eventPublisher.publishEvent(new StockResultEvent(headerOrderId, "fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage()));
+                eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage()));
             }
         } catch (Exception e) {
             log.error("Error processing stock request", e);
-            eventPublisher.publishEvent(new StockResultEvent(headerOrderId, "fail", e.getMessage()));
+            eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "fail", e.getMessage()));
         }
     }
 

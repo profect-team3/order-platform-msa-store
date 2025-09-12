@@ -19,16 +19,18 @@ public class StockProducer {
     private final ObjectMapper objectMapper;
 
     public void sendStockResult(String headerOrderId, String eventType, String message) {
-        String value = null;
+        String value = "";
         
-        if ("fail".equals(eventType) && message != null && !message.isEmpty()) {
-            try {
-                Map<String, Object> errorMap = new HashMap<>();
-                errorMap.put("errorMessage", message);
-                value = objectMapper.writeValueAsString(errorMap);
-            } catch (Exception e) {
-                log.error("Failed to serialize error message", e);
+        try {
+            Map<String, Object> resultMap = new HashMap<>();
+            if ("fail".equals(eventType) && message != null && !message.isEmpty()) {
+                resultMap.put("errorMessage", message);
+            } else {
+                resultMap.put("errorMessage", "");
             }
+            value = objectMapper.writeValueAsString(resultMap);
+        } catch (Exception e) {
+            log.error("Failed to serialize result message", e);
         }
         
         ProducerRecord<String, Object> record = new ProducerRecord<>("stock.result", value);

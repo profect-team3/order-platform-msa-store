@@ -46,7 +46,8 @@ public class OrderValidConsumer {
 			headers.put("orderId", headerOrderId);
 			Map<String, Object> errorPayload = new HashMap<>();
 			errorPayload.put("errorMessage", "Parse error");
-			orderValidProducer.sendOrderValidResult(headers, errorPayload);
+			List<Map<String,Object>> errorPayLoadList = List.of(errorPayload);
+			orderValidProducer.sendOrderValidResult(headers, errorPayLoadList);
 			return;
 		}
 
@@ -113,7 +114,8 @@ public class OrderValidConsumer {
 			headers.put("orderId", headerOrderId);
 			Map<String, Object> errorPayload = new HashMap<>();
 			errorPayload.put("errorMessage", e.getErrorReason().getMessage());
-			orderValidProducer.sendOrderValidResult(headers, errorPayload);
+			List<Map<String,Object>> errorPayLoadList = List.of(errorPayload);
+			orderValidProducer.sendOrderValidResult(headers, errorPayLoadList);
 		}
 	}
 

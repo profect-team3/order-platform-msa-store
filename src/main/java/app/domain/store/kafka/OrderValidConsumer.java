@@ -33,6 +33,7 @@ public class OrderValidConsumer {
 	private final StoreRepository storeRepository;
 	private final MenuRepository menuRepository;
 	private final OrderValidProducer orderValidProducer;
+	private final OrderCreatedProducer orderCreatedProducer;
 
 	@KafkaListener(topics="order.valid.request",groupId = "order.valid.consumer")
 	public void consume(String message, @Header(value = "orderId", required = false) String headerOrderId){
@@ -101,6 +102,9 @@ public class OrderValidConsumer {
 			headers.put("eventType", "success");
 			headers.put("orderId", headerOrderId);
 			orderValidProducer.sendOrderValidResult(headers, menuList);
+
+			// Publish order completed event
+			orderCreatedProducer.publishOrderCompleted(items, totalPrice, headerOrderId);
 
 		} catch (GeneralException e) {
 			// --- Failure Case ---

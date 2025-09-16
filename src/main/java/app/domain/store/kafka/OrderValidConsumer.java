@@ -33,6 +33,7 @@ public class OrderValidConsumer {
 	private final StoreRepository storeRepository;
 	private final MenuRepository menuRepository;
 	private final OrderValidProducer orderValidProducer;
+	private final OrderCreatedProducer orderCreatedProducer;
 
 	@KafkaListener(topics="order.valid.request",groupId = "order.valid.consumer")
 	public void consume(String message, @Header(value = "orderId", required = false) String headerOrderId){
@@ -45,7 +46,8 @@ public class OrderValidConsumer {
 			headers.put("orderId", headerOrderId);
 			Map<String, Object> errorPayload = new HashMap<>();
 			errorPayload.put("errorMessage", "Parse error");
-			orderValidProducer.sendOrderValidResult(headers, errorPayload);
+			List<Map<String,Object>> errorPayLoadList = List.of(errorPayload);
+			orderValidProducer.sendOrderValidResult(headers, errorPayLoadList);
 			return;
 		}
 
@@ -102,6 +104,9 @@ public class OrderValidConsumer {
 			headers.put("orderId", headerOrderId);
 			orderValidProducer.sendOrderValidResult(headers, menuList);
 
+			// Publish order completed event
+			orderCreatedProducer.publishOrderCompleted(items, totalPrice, headerOrderId);
+
 		} catch (GeneralException e) {
 			// --- Failure Case ---
 			Map<String, Object> headers = new HashMap<>();
@@ -109,7 +114,8 @@ public class OrderValidConsumer {
 			headers.put("orderId", headerOrderId);
 			Map<String, Object> errorPayload = new HashMap<>();
 			errorPayload.put("errorMessage", e.getErrorReason().getMessage());
-			orderValidProducer.sendOrderValidResult(headers, errorPayload);
+			List<Map<String,Object>> errorPayLoadList = List.of(errorPayload);
+			orderValidProducer.sendOrderValidResult(headers, errorPayLoadList);
 		}
 	}
 

@@ -1,19 +1,20 @@
-# ===== Builder Stage =====
 FROM gradle:8.8-jdk17 AS builder
 WORKDIR /workspace
 
 COPY gradlew .
 COPY gradlew.bat .
 COPY gradle ./gradle
+
 COPY build.cloud.gradle build.gradle
 COPY settings.gradle .
+
 COPY src ./src
 COPY libs ./libs
 
 RUN ./gradlew bootJar -x test
 
-# ===== Runtime Stage =====
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:17-jre-jammy
+
 WORKDIR /app
 
 COPY --from=builder /workspace/build/libs/*.jar ./application.jar

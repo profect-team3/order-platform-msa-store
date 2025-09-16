@@ -48,28 +48,44 @@ public class StockService {
         """;
 
     @Transactional
-    public void processStockRequest(List<Map<String, Object>> stockRequests,String headerOrderId) {
+    public void processStock(List<Map<String, Object>> stockRequests, String headerOrderId, boolean isRefund) {
         try {
-            List<String> keys = stockRequests.stream()
-                    .map(req -> "stock:" + req.get("menuId"))
-                    .collect(Collectors.toList());
-
-            List<String> quantities = stockRequests.stream()
-                    .map(req -> String.valueOf(req.get("quantity")))
-                    .collect(Collectors.toList());
-
-            DefaultRedisScript<Long> script = new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
-            Long result = redisTemplate.execute(script, keys, quantities.toArray());
-
-            if (result != null && result == 1L) {
-                updateDatabaseStock(stockRequests);
-                eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "success", ""));
+            if (isRefund) {
+                stockRequests.forEach(req -> {
+                    String menuId = req.get("menuId").toString();
+                    Integer quantity = Integer.valueOf(req.get("quantity").toString());
+                    redisTemplate.opsForValue().increment("stock:" + menuId, quantity);
+                });
+                updateDatabaseStock(stockRequests, true);
+                log.info("재고 환불 처리 완료: {}", stockRequests);
             } else {
-                eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage()));
+                List<String> keys = stockRequests.stream()
+                        .map(req -> "stock:" + req.get("menuId"))
+                        .collect(Collectors.toList());
+
+                List<String> quantities = stockRequests.stream()
+                        .map(req -> String.valueOf(req.get("quantity")))
+                        .collect(Collectors.toList());
+
+                DefaultRedisScript<Long> script = new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
+                Long result = redisTemplate.execute(script, keys, quantities.toArray());
+
+                if (result != null && result == 1L) {
+                    updateDatabaseStock(stockRequests, false);
+                    eventPublisher.publishEvent(new StockResultEvent(this, headerOrderId, "success", ""));
+                } else {
+                    if (processStockFromDatabase(stockRequests)) {
+                        eventPublisher.publishEvent(new StockResultEvent(this, headerOrderId, "success", ""));
+                    } else {
+                        eventPublisher.publishEvent(new StockResultEvent(this, headerOrderId, "fail", StoreMenuErrorCode.OUT_OF_STOCK.getMessage()));
+                    }
+                }
             }
         } catch (Exception e) {
-            log.error("Error processing stock request", e);
-            eventPublisher.publishEvent(new StockResultEvent(this,headerOrderId, "fail", e.getMessage()));
+            log.error("재고 처리 실패", e);
+            if (!isRefund) {
+                eventPublisher.publishEvent(new StockResultEvent(this, headerOrderId, "fail", e.getMessage()));
+            }
         }
     }
 
@@ -79,7 +95,7 @@ public class StockService {
         backoff = @Backoff(delay = 300, multiplier = 2)
     )
     @Transactional
-    public void updateDatabaseStock(List<Map<String, Object>> stockRequests) {
+    public void updateDatabaseStock(List<Map<String, Object>> stockRequests, boolean isIncrease) {
         List<UUID> menuIds = stockRequests.stream()
                 .map(req -> UUID.fromString(req.get("menuId").toString()))
                 .collect(Collectors.toList());
@@ -92,13 +108,59 @@ public class StockService {
             Integer quantity = Integer.valueOf(req.get("quantity").toString());
             Stock stock = stockMap.get(menuId);
             if (stock != null) {
-                stock.setStock(stock.getStock() - quantity);
+                stock.setStock(isIncrease ? stock.getStock() + quantity : stock.getStock() - quantity);
             }
         });
     }
 
+    @Transactional
+    public boolean processStockFromDatabase(List<Map<String, Object>> stockRequests) {
+        try {
+            List<UUID> menuIds = stockRequests.stream()
+                    .map(req -> UUID.fromString(req.get("menuId").toString()))
+                    .collect(Collectors.toList());
+
+            Map<UUID, Stock> stockMap = stockRepository.findByMenuMenuIdIn(menuIds).stream()
+                    .collect(Collectors.toMap(stock -> stock.getMenu().getMenuId(), stock -> stock));
+
+            for (Map<String, Object> req : stockRequests) {
+                UUID menuId = UUID.fromString(req.get("menuId").toString());
+                Integer quantity = Integer.valueOf(req.get("quantity").toString());
+                Stock stock = stockMap.get(menuId);
+                
+                if (stock == null || stock.getStock() < quantity) {
+                    return false;
+                }
+            }
+
+            stockRequests.forEach(req -> {
+                UUID menuId = UUID.fromString(req.get("menuId").toString());
+                Integer quantity = Integer.valueOf(req.get("quantity").toString());
+                Stock stock = stockMap.get(menuId);
+                stock.setStock(stock.getStock() - quantity);
+                
+                redisTemplate.opsForValue().set("stock:" + menuId, String.valueOf(stock.getStock()));
+            });
+            
+            return true;
+        } catch (Exception e) {
+            log.error("DB 재고 처리 실패", e);
+            return false;
+        }
+    }
+
+    @Transactional
+    public void processStockRequest(List<Map<String, Object>> stockRequests, String headerOrderId) {
+        processStock(stockRequests, headerOrderId, false);
+    }
+
+    @Transactional
+    public void processStockRefund(List<Map<String, Object>> stockRequests) {
+        processStock(stockRequests, null, true);
+    }
+
     @Recover
-    public void recoverUpdateDatabaseStock(ObjectOptimisticLockingFailureException e, List<Map<String, Object>> stockRequests) {
+    public void recoverUpdateDatabaseStock(ObjectOptimisticLockingFailureException e, List<Map<String, Object>> stockRequests, boolean isIncrease) {
         log.error("DB 재고 업데이트 재시도 모두 실패: {}", stockRequests, e);
         throw e;
     }

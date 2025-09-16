@@ -19,7 +19,7 @@ public class StockConsumer {
     private final StockService stockService;
     private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "stock.request", groupId = "stock-group")
+    @KafkaListener(topics = "stock.request", groupId = "stock.group")
     public void handleStockRequest(String message, @Header(value = "orderId", required = false) String headerOrderId) {
         try {
             List<Map<String, Object>> stockRequests = objectMapper.readValue(message, new TypeReference<List<Map<String, Object>>>() {});
@@ -27,6 +27,17 @@ public class StockConsumer {
             stockService.processStockRequest(stockRequests,headerOrderId);
         } catch (Exception e) {
             log.error("Failed to parse stock request message: {}", message, e);
+        }
+    }
+
+    @KafkaListener(topics = "refund.request",groupId= "stock.refund.group")
+    public void handleRefundRequest(String message, @Header(value = "orderId", required = false) String headerOrderId) {
+        try {
+            List<Map<String, Object>> refundRequests = objectMapper.readValue(message, new TypeReference<List<Map<String, Object>>>() {});
+            log.info("Received refund request: {}", refundRequests);
+            stockService.processStockRefund(refundRequests);
+        } catch (Exception e) {
+            log.error("Failed to parse refund request message: {}", message, e);
         }
     }
 }

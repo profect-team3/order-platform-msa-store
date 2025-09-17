@@ -48,3 +48,15 @@ jwt:
 discord:
   webhook:
     url: ${DISCORD_URL}
+
+order:
+  service:
+    url: ${ORDER_SVC_URI}
+
+review:
+  service:
+    url: ${REVIEW_SVC_URI}
+
+user:
+  service:
+    url: ${USER_SVC_URI}

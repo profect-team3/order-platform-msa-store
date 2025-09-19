@@ -1,5 +1,4 @@
 FROM gradle:8.8-jdk17 AS builder
-
 WORKDIR /workspace
 
 COPY gradlew .
@@ -18,9 +17,8 @@ FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-COPY --from=builder /workspace/build/libs/*.jar /app/application.jar
+COPY --from=builder /workspace/build/libs/*.jar ./application.jar
 
 EXPOSE 8082
 
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "/app/application.jar"]
-
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "./application.jar"]
